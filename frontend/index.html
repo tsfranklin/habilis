@@ -1,31 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Habilis - Aplicación Web">
-    <title>Habilis</title>
+    <meta name="description" content="HÁBILIS - Plataforma Educativa para combatir la dependencia digital infantil">
+    <title>HÁBILIS - Desconectar para Reconectar</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Bienvenido a Habilis</h1>
-        </header>
-        
-        <main>
-            <section class="content">
-                <p>Esta es la aplicación web de Habilis.</p>
-                <button id="testButton">Probar Conexión API</button>
-                <div id="response"></div>
-            </section>
-        </main>
-        
-        <footer>
-            <p>&copy; 2026 Habilis. Todos los derechos reservados.</p>
-        </footer>
-    </div>
-    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🧩 HÁBILIS</h1>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link">Inicio</a>
+                <a href="#about" class="nav-link">Misión</a>
+                <a href="#test" class="nav-link">Probar API</a>
+                <a href="#" class="btn-primary">Acceder</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="hero-title">Desconectar para Reconectar</h2>
+                <p class="hero-subtitle">
+                    Combatiendo la dependencia digital infantil mediante el juego tangible
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-large btn-primary">Comenzar Ahora</button>
+                    <button class="btn-large btn-secondary">Saber Más</button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number">3-13</div>
+                    <div class="stat-label">Años de edad</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Misiones/año</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Sin pantallas</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">Nuestra Misión</h2>
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="mission-icon">🎯</div>
+                    <h3>Motricidad Fina</h3>
+                    <p>Desarrollamos habilidades manuales a través de actividades prácticas y creativas.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon">🧠</div>
+                    <h3>Concentración Profunda</h3>
+                    <p>Fomentamos el "Deep Work" mediante retos que requieren atención sostenida.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon">✨</div>
+                    <h3>Creatividad Manual</h3>
+                    <p>Estimulamos la imaginación con materiales tangibles y proyectos únicos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Testing Section -->
+    <section class="api-test" id="test">
+        <div class="container">
+            <h2 class="section-title">Probar Conexión API</h2>
+            <p class="section-subtitle">Verifica que el backend está funcionando correctamente</p>
+
+            <div class="test-grid">
+                <!-- Health Check Test -->
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3>Health Check</h3>
+                        <span class="endpoint-badge">GET</span>
+                    </div>
+                    <p class="endpoint-url">/api/health</p>
+                    <button class="btn-test" onclick="testHealth()">
+                        <span class="btn-icon">🔍</span>
+                        Probar Endpoint
+                    </button>
+                    <div id="health-response" class="response-box"></div>
+                </div>
+
+                <!-- Welcome Test -->
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3>Welcome</h3>
+                        <span class="endpoint-badge">GET</span>
+                    </div>
+                    <p class="endpoint-url">/api/welcome</p>
+                    <button class="btn-test" onclick="testWelcome()">
+                        <span class="btn-icon">👋</span>
+                        Probar Endpoint
+                    </button>
+                    <div id="welcome-response" class="response-box"></div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <h3>Estado del Sistema</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Frontend:</span>
+                        <span class="status-value status-online">● Online</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Backend:</span>
+                        <span class="status-value" id="backend-status">● Verificando...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Base de Datos:</span>
+                        <span class="status-value" id="db-status">● Verificando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🧩 HÁBILIS</h4>
+                    <p>El Netflix de las manualidades.<br>Tecnología para salir de la tecnología.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <p>info@habilis.com<br>+34 900 123 456</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Tecnología</h4>
+                    <p>Spring Boot + PostgreSQL<br>Docker + Nginx</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 HÁBILIS. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="js/app.js"></script>
 </body>
+
 </html>
