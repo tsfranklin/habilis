@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # 1. Base de Datos (PostgreSQL)
+  db:
+    image: postgres:15
+    container_name: habilis_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: habilis_db      # <--- Nombre de tu BD
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - red-habilis
+
+  # 2. API Backend (Spring Boot)
+  backend:
+    build: ./backend-api
+    container_name: habilis_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # Conexión JDBC usando el nombre del servicio 'db'
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/habilis_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin123
+    networks:
+      - red-habilis
+
+  # 3. Web Frontend (Nginx)
+  frontend:
+    build: ./frontend
+    container_name: habilis_web
+    ports:
+      - "80:80"  # Entrarás por http://localhost
+    depends_on:
+      - backend
+    networks:
+      - red-habilis
+
+networks:
+  red-habilis:
+
+volumes:
+  postgres_data:
