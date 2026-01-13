@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <h1>🧩 HÁBILIS</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="user-dashboard.html" class="nav-link">🏠 Dashboard</a>
+            <a href="catalog.html" class="nav-link">📦 Catálogo</a>
+            <a href="#" class="nav-link active">🛒 Carrito</a>
+            <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="cart-container">
+        <h1>Mi Carrito</h1>
+
+        <div id="cartItems" class="cart-items"></div>
+
+        <div class="cart-summary">
+            <h3>Resumen del Pedido</h3>
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">€0.00</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>Total:</span>
+                <span id="cartTotal">€0.00</span>
+            </div>
+            <button onclick="checkout()" class="btn-checkout" id="checkoutBtn">Realizar Pedido</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        let products = {};
+
+        async function loadCart() {
+            const container = document.getElementById('cartItems');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="empty-message">Tu carrito está vacío. <a href="catalog.html">¡Explora el catálogo!</a></p>';
+                return;
+            }
+
+            // Load product details
+            for (const item of cart) {
+                if (!products[item.productoId]) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/productos/${item.productoId}`);
+                        products[item.productoId] = await response.json();
+                    } catch (error) {
+                        console.error(`Error loading product ${item.productoId}:`, error);
+                    }
+                }
+            }
+
+            // Display cart items
+            container.innerHTML = cart.map((item, index) => {
+                const product = products[item.productoId];
+                if (!product) return '';
+
+                const subtotal = product.precio * item.cantidad;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h3>${product.nombre}</h3>
+                            <p class="cart-item-price">€${product.precio.toFixed(2)} /unidad</p>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button onclick="updateQuantity(${index}, -1)" class="btn-quantity">-</button>
+                            <span class="cart-item-quantity">${item.cantidad}</span>
+                            <button onclick="updateQuantity(${index}, 1)" class="btn-quantity">+</button>
+                        </div>
+                        <div class="cart-item-subtotal">
+                            <span>€${subtotal.toFixed(2)}</span>
+                            <button onclick="removeItem(${index})" class="btn-remove">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateTotals();
+        }
+
+        function updateQuantity(index, change) {
+            cart[index].cantidad += change;
+            if (cart[index].cantidad <= 0) {
+                removeItem(index);
+            } else {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        function updateTotals() {
+            let total = 0;
+            cart.forEach(item => {
+                const product = products[item.productoId];
+                if (product) {
+                    total += product.precio * item.cantidad;
+                }
+            });
+
+            document.getElementById('cartSubtotal').textContent = `€${total.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `€${total.toFixed(2)}`;
+        }
+
+        async function checkout() {
+            if (cart.length === 0) {
+                alert('El carrito está vacío');
+                return;
+            }
+
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Procesando...';
+
+            try {
+                // Get current user ID
+                const userResponse = await fetch(`${API_BASE_URL}/auth/me`, { credentials: 'include' });
+                const userData = await userResponse.json();
+
+                const orderData = {
+                    usuarioId: userData.id,
+                    items: cart
+                };
+
+                const response = await fetch(`${API_BASE_URL}/pedidos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(orderData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('¡Pedido realizado exitosamente!');
+                    localStorage.removeItem('cart');
+                    window.location.href = 'user-dashboard.html';
+                } else {
+                    alert(data.error || 'Error al procesar el pedido');
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Error al procesar el pedido');
+            } finally {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Realizar Pedido';
+            }
+        }
+
+        async function logout() {
+            await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+            window.location.href = 'login.html';
+        }
+
+        loadCart();
+    </script>
+</body>
+
+</html>

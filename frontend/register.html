@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1 class="auth-logo">🧩 HÁBILIS</h1>
+                <p class="auth-subtitle">Crea tu cuenta y comienza</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <h2 class="form-title">Registro</h2>
+                
+                <div class="form-group">
+                    <label for="registerName">Nombre Completo</label>
+                    <input 
+                        type="text" 
+                        id="registerName" 
+                        name="nombreCompleto"
+                        placeholder="Juan Pérez"
+                        required
+                        minlength="3"
+                        maxlength="50"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        id="registerEmail" 
+                        name="correoElectronico"
+                        placeholder="tu@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPhone">Teléfono Móvil</label>
+                    <input 
+                        type="tel" 
+                        id="registerPhone" 
+                        name="movil"
+                        placeholder="+34600111222"
+                        required
+                        pattern="\+34[6-9][0-9]{8}"
+                        title="Formato: +34XXXXXXXXX"
+                    >
+                    <small class="form-help">Formato: +34XXXXXXXXX</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="registerPassword" 
+                        name="contrasena"
+                        placeholder="••••••••"
+                        required
+                        minlength="8"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$"
+                        title="Mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número"
+                    >
+                    <small class="form-help">Mínimo 8 caracteres, incluye mayúscula, minúscula y número</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPasswordConfirm">Confirmar Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="registerPasswordConfirm" 
+                        name="passwordConfirm"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" required>
+                    <span>Acepto los <a href="#" class="link-text">términos y condiciones</a></span>
+                </label>
+
+                <button type="submit" class="btn-auth btn-primary">
+                    <span class="btn-text">Crear Cuenta</span>
+                    <span class="btn-loader" style="display: none;">⏳</span>
+                </button>
+
+                <div id="registerError" class="alert alert-error" style="display: none;"></div>
+                <div id="registerSuccess" class="alert alert-success" style="display: none;"></div>
+            </form>
+
+            <div class="auth-footer">
+                <p>¿Ya tienes cuenta? <a href="login.html" class="link-primary">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+
+        <div class="auth-features">
+            <h3>🎁 ¿Qué incluyen los kits?</h3>
+            <ul class="features-list">
+                <li>📦 12 misiones anuales</li>
+                <li>🎨 Materiales didácticos premium</li>
+                <li>📘 Guías detalladas</li>
+                <li>🏆 Retos adaptados por edad</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

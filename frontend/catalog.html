@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <h1>🧩 HÁBILIS</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="user-dashboard.html" class="nav-link">🏠 Dashboard</a>
+            <a href="#" class="nav-link active">📦 Catálogo</a>
+            <a href="cart.html" class="nav-link">🛒 Carrito <span id="cartBadge" class="badge">0</span></a>
+            <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="catalog-container">
+        <div class="catalog-header">
+            <h1>Catálogo de Productos</h1>
+            <input type="text" id="searchInput" placeholder="Buscar productos..." class="search-input">
+        </div>
+
+        <!-- Categories -->
+        <div class="categories-nav">
+            <button onclick="filterByCategory(null)" class="category-btn active" id="cat-all">Todos</button>
+            <div id="categoriesContainer"></div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="products-grid">
+            <div class="loading">Cargando productos...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentCategory = null;
+        let allProducts = [];
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/categorias`);
+                const categories = await response.json();
+                const container = document.getElementById('categoriesContainer');
+                container.innerHTML = categories.map(cat => `
+                    <button onclick="filterByCategory(${cat.id})" class="category-btn" id="cat-${cat.id}">
+                        ${cat.nombre}
+                    </button>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const url = currentCategory
+                    ? `${API_BASE_URL}/productos/categoria/${currentCategory}`
+                    : `${API_BASE_URL}/productos`;
+
+                const response = await fetch(url);
+                allProducts = await response.json();
+                displayProducts(allProducts);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsGrid').innerHTML = '<p class="error-message">Error al cargar productos</p>';
+            }
+        }
+
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            if (products.length === 0) {
+                grid.innerHTML = '<p class="empty-message">No hay productos disponibles</p>';
+                return;
+            }
+
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="product-emoji">${product.imagenUrl || '📦'}</span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.nombre}</h3>
+                        <p class="product-description">${product.descripcion || ''}</p>
+                        <div class="product-footer">
+                            <span class="product-price">€${product.precio.toFixed(2)}</span>
+                            <span class="product-stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}">
+                                ${product.stock > 0 ? `Stock: ${product.stock}` : 'Sin stock'}
+                            </span>
+                        </div>
+                        ${product.stock > 0 ? `
+                            <button onclick="addToCart(${product.id})" class="btn-add-cart">
+                                🛒 Agregar al Carrito
+                            </button>
+                        ` : `
+                            <button class="btn-add-cart btn-disabled" disabled>Sin Stock</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterByCategory(categoryId) {
+            currentCategory = categoryId;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`cat-${categoryId || 'all'}`).classList.add('active');
+            loadProducts();
+        }
+
+        function addToCart(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.productoId === productId);
+            if (existingItem) {
+                existingItem.cantidad++;
+            } else {
+                cart.push({ productoId: productId, cantidad: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            alert(`${product.nombre} agregado al carrito`);
+        }
+
+        function updateCartBadge() {
+            const total = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            document.getElementById('cartBadge').textContent = total;
+        }
+
+        async function logout() {
+            await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+            window.location.href = 'login.html';
+        }
+
+        // Search
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(query));
+            displayProducts(filtered);
+        });
+
+        // Load on page ready
+        loadCategories();
+        loadProducts();
+        updateCartBadge();
+    </script>
+</body>
+
+</html>
