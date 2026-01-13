@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,19 @@ public class Usuario {
     @Column(name = "cuenta_activa", nullable = false)
     private Boolean cuentaActiva = false;
 
+    // Campos para Autenticación de Dos Factores (2FA)
+    @Column(name = "tfa_habilitado", nullable = false)
+    private Boolean twoFactorEnabled = false;
+
+    @Column(name = "tfa_secreto", length = 100)
+    private String twoFactorSecret;
+
+    @Column(name = "intentos_tfa", nullable = false)
+    private Integer twoFactorAttempts = 0;
+
+    @Column(name = "ultimo_intento_tfa")
+    private LocalDateTime lastTwoFactorAttempt;
+
     // Relación con Pedidos (un usuario puede tener muchos pedidos)
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido> pedidos = new ArrayList<>();
@@ -58,8 +72,8 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String nombreCompleto, String movil, String correoElectronico, 
-                   String tipoUsuario, String contrasena) {
+    public Usuario(String nombreCompleto, String movil, String correoElectronico,
+            String tipoUsuario, String contrasena) {
         this.nombreCompleto = nombreCompleto;
         this.movil = movil;
         this.correoElectronico = correoElectronico;
@@ -139,5 +153,38 @@ public class Usuario {
 
     public void setPedidos(List<Pedido> pedidos) {
         this.pedidos = pedidos;
+    }
+
+    // Getters y Setters para 2FA
+    public Boolean getTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public void setTwoFactorEnabled(Boolean twoFactorEnabled) {
+        this.twoFactorEnabled = twoFactorEnabled;
+    }
+
+    public String getTwoFactorSecret() {
+        return twoFactorSecret;
+    }
+
+    public void setTwoFactorSecret(String twoFactorSecret) {
+        this.twoFactorSecret = twoFactorSecret;
+    }
+
+    public Integer getTwoFactorAttempts() {
+        return twoFactorAttempts;
+    }
+
+    public void setTwoFactorAttempts(Integer twoFactorAttempts) {
+        this.twoFactorAttempts = twoFactorAttempts;
+    }
+
+    public LocalDateTime getLastTwoFactorAttempt() {
+        return lastTwoFactorAttempt;
+    }
+
+    public void setLastTwoFactorAttempt(LocalDateTime lastTwoFactorAttempt) {
+        this.lastTwoFactorAttempt = lastTwoFactorAttempt;
     }
 }
