@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">🧩 HÁBILIS <span>Admin</span></a>
+        <div class="nav-links">
+            <a href="catalog.html">Ver Catálogo</a>
+            <a href="user-dashboard.html">Mi Perfil</a>
+            <a href="#" onclick="logout()">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1 style="color: var(--primary-color); margin-bottom: 2rem;">Panel de Administración</h1>
+
+        <!-- Tab Navigation -->
+        <div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+            <button class="btn btn-primary" onclick="mostrarSeccion('productos')">Gestionar Productos</button>
+            <button class="btn btn-secondary" onclick="mostrarSeccion('categorias')">Gestionar Categorías</button>
+            <button class="btn btn-secondary" onclick="mostrarSeccion('pedidos')">Ver Pedidos</button>
+        </div>
+
+        <!-- SECTION: PRODUCTOS -->
+        <section id="sec-productos">
+            <div class="card">
+                <h2>Crear/Editar Producto</h2>
+                <form id="productoForm">
+                    <input type="hidden" id="prodId">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="prodNombre" placeholder="Ej: Kit de Robótica Nivel 1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio (€)</label>
+                            <input type="number" id="prodPrecio" placeholder="29.99" required step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="prodCategoria" required>
+                                <option value="" disabled selected>Seleccione categoría...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Disponible</label>
+                            <input type="number" id="prodStock" placeholder="50" required min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea id="prodDesc" placeholder="Descripción pedagógica del kit..." rows="3"
+                            required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL de Imagen (o emoji)</label>
+                        <input type="text" id="prodImagen" placeholder="📦 (emoji) o https://...">
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <span id="btnTexto">Crear Producto</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()" id="btnCancelar"
+                        style="display: none;">
+                        Cancelar
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Listado de Productos</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaProductos">
+                            <tr>
+                                <td colspan="6" class="text-center">Cargando productos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: CATEGORIAS -->
+        <section id="sec-categorias" style="display: none;">
+            <div class="card">
+                <h2>Crear/Editar Categoría</h2>
+                <form id="categoriaForm">
+                    <input type="hidden" id="catId">
+                    <div class="form-group">
+                        <label>Nombre de la Categoría</label>
+                        <input type="text" id="catNombre" placeholder="Ej: Robótica" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea id="catDesc" placeholder="Descripción de la categoría..." rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <span id="btnTextoCategoria">Crear Categoría</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicionCategoria()"
+                        id="btnCancelarCategoria" style="display: none;">
+                        Cancelar
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Listado de Categorías</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Productos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCategorias">
+                        <tr>
+                            <td colspan="5" class="text-center">Cargando categorías...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION: PEDIDOS -->
+        <section id="sec-pedidos" style="display: none;">
+            <div class="card">
+                <h2>Todos los Pedidos</h2>
+                <div style="margin-bottom: 1rem;">
+                    <label>Filtrar por estado:</label>
+                    <select id="filtroEstado" onchange="cargarPedidosAdmin()">
+                        <option value="">Todos</option>
+                        <option value="PENDIENTE">Pendientes</option>
+                        <option value="ENVIADO">Enviados</option>
+                        <option value="COMPLETADO">Completados</option>
+                        <option value="CANCELADO">Cancelados</option>
+                    </select>
+                </div>
+                <div id="listaPedidos">
+                    <p class="text-center">Cargando pedidos...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 HÁBILIS - Panel de Administración</p>
+    </footer>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
