@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Cuenta | HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">🧩 HÁBILIS</a>
+    </nav>
+
+    <div class="container" style="max-width: 600px; margin-top: 3rem;">
+        <div class="card">
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <h1 style="color: var(--primary-color);">📧 Confirma tu Cuenta</h1>
+                <p>Hemos enviado un código de confirmación a tu correo electrónico</p>
+            </div>
+
+            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+            <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+
+            <form id="confirmForm">
+                <div class="form-group">
+                    <label for="confirmToken">Código de Confirmación</label>
+                    <input type="text" id="confirmToken" placeholder="Ej: da52427d-7a03-4262-ab65-dbb8574c8d96" required
+                        style="text-align: center; font-family: monospace;">
+                    <small class="form-help">Revisa tu correo electrónico y copia el código completo</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <span class="btn-text">Activar Cuenta</span>
+                    <span class="btn-loader" style="display: none;">⏳ Procesando...</span>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+                <p style="color: #666;">¿No recibiste el correo?</p>
+                <button onclick="reenviarCorreo()" class="btn btn-secondary" id="btnReenviar">
+                    📨 Reenviar Código
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="login.html" style="color: var(--secondary-color);">Ya activé mi cuenta, ir al Login</a>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="card" style="background-color: #f8f9fa; margin-top: 2rem;">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">💡 ¿Cómo encontrar el código?</h3>
+            <ol style="color: #666; line-height: 1.8;">
+                <li>Revisa tu bandeja de entrada (y spam)</li>
+                <li>Busca un correo de <strong>HÁBILIS</strong></li>
+                <li>El código está en el cuerpo del mensaje</li>
+                <li>Cópialo completo y pégalo arriba</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 HÁBILIS - Educación diferente</p>
+    </footer>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        // Auto-fill token from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = urlParams.get('token');
+        if (tokenFromUrl) {
+            document.getElementById('confirmToken').value = tokenFromUrl;
+            // Auto-submit if token in URL
+            setTimeout(() => {
+                document.getElementById('confirmForm').dispatchEvent(new Event('submit'));
+            }, 500);
+        }
+
+        document.getElementById('confirmForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const token = document.getElementById('confirmToken').value.trim();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.btn-loader').style.display = 'inline';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/confirmar-email?token=${token}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('✅ ¡Cuenta activada exitosamente! Redirigiendo al login...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showError(data.message || 'Token inválido o expirado');
+                    submitBtn.disabled = false;
+                    submitBtn.querySelector('.btn-text').style.display = 'inline';
+                    submitBtn.querySelector('.btn-loader').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error de conexión con el servidor');
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.btn-text').style.display = 'inline';
+                submitBtn.querySelector('.btn-loader').style.display = 'none';
+            }
+        });
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showError(message) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        async function reenviarCorreo() {
+            const btn = document.getElementById('btnReenviar');
+            btn.disabled = true;
+            btn.textContent = '📨 Enviando...';
+
+            // Por ahora, mostrar mensaje
+            showError('Función de reenvío aún no implementada. Por favor, regístrate nuevamente si necesitas un nuevo código.');
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '📨 Reenviar Código';
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

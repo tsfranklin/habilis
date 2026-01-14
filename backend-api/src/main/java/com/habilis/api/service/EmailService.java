@@ -36,7 +36,7 @@ public class EmailService {
                         "Gracias por registrarte en HÁBILIS.\n\n" +
                         "Para activar tu cuenta, usa el siguiente token de confirmación:\n\n" +
                         "Token: %s\n\n" +
-                        "O visita: http://localhost/confirmar-email?token=%s\n\n" +
+                        "O haz clic en este enlace: http://localhost/confirm-email.html?token=%s\n\n" +
                         "Si no solicitaste esta cuenta, ignora este mensaje.\n\n" +
                         "Saludos,\n" +
                         "El equipo de HÁBILIS",
