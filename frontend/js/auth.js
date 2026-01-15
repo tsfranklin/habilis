@@ -25,11 +25,11 @@ function hideLoader(buttonElement) {
 function showMessage(elementId, message, type = 'error') {
     const element = document.getElementById(elementId);
     if (!element) return;
-    
+
     element.textContent = message;
     element.className = `alert alert-${type}`;
     element.style.display = 'block';
-    
+
     // Ocultar después de 5 segundos
     setTimeout(() => {
         element.style.display = 'none';
@@ -42,15 +42,15 @@ function showMessage(elementId, message, type = 'error') {
 
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
-    
+
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
+
     showLoader(submitBtn);
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
@@ -63,9 +63,9 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
                 contrasena: password
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Check if 2FA is required
             if (data.requires2FA) {
@@ -98,23 +98,23 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 
 document.getElementById('twoFactorForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
-    
+
     const userId = document.getElementById('twoFactorUserId').value;
     const code = document.getElementById('twoFactorCode').value;
-    
+
     showLoader(submitBtn);
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/verificar-2fa?usuarioId=${userId}&codigo=${code}`, {
             method: 'POST',
             credentials: 'include'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             showMessage('loginSuccess', 'Verificación exitosa', 'success');
             setTimeout(() => {
@@ -143,28 +143,28 @@ function cancel2FA() {
 
 document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
-    
+
     const password = document.getElementById('registerPassword').value;
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-    
+
     // Validate password match
     if (password !== passwordConfirm) {
         showMessage('registerError', 'Las contraseñas no coinciden');
         return;
     }
-    
+
     const formData = {
         nombreCompleto: document.getElementById('registerName').value,
         correoElectronico: document.getElementById('registerEmail').value,
         movil: document.getElementById('registerPhone').value,
         contrasena: password
     };
-    
+
     showLoader(submitBtn);
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
@@ -173,20 +173,20 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
             },
             body: JSON.stringify(formData)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
-            showMessage('registerSuccess', 
+            showMessage('registerSuccess',
                 'Cuenta creada exitosamente. Revisa tu correo para activar tu cuenta. ' +
-                '(Nota: Si no configuraste SMTP, el token aparecerá en los logs del backend)', 
+                '(Nota: Si no configuraste SMTP, el token aparecerá en los logs del backend)',
                 'success'
             );
             form.reset();
-            
-            // Redirect to login after 3 seconds
+
+            // Redirect to confirmation page after 3 seconds
             setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = 'confirm-email.html';
             }, 3000);
         } else {
             showMessage('registerError', data.message || 'Error al registrar usuario');
