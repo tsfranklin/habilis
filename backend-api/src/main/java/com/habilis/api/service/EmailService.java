@@ -57,14 +57,13 @@ public class EmailService {
         String mensaje = String.format(
                 "Hola %s,\n\n" +
                         "Recibimos una solicitud para restablecer tu contraseña.\n\n" +
-                        "Usa el siguiente token para restablecer tu contraseña:\n\n" +
-                        "Token: %s\n\n" +
-                        "O visita: http://localhost/restablecer-password?token=%s\n\n" +
-                        "Este token expirará en 1 hora.\n\n" +
+                        "Haz clic en el siguiente enlace para crear una nueva contraseña:\n\n" +
+                        "%s\n\n" +
+                        "Este enlace expirará en 1 hora.\n\n" +
                         "Si no solicitaste esto, ignora este mensaje y tu contraseña permanecerá sin cambios.\n\n" +
                         "Saludos,\n" +
                         "El equipo de HÁBILIS",
-                nombreCompleto, token, token);
+                nombreCompleto, "http://localhost/reset-password.html?token=" + token);
 
         enviarEmail(destinatario, asunto, mensaje);
     }

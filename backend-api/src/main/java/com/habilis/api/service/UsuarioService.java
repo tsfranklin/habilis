@@ -321,4 +321,35 @@ public class UsuarioService {
     public Optional<Usuario> buscarPorEmail(String correoElectronico) {
         return usuarioRepository.findByCorreoElectronico(correoElectronico);
     }
+
+    /**
+     * Reenviar email de confirmación (genera nuevo token)
+     * 
+     * @param correoElectronico Email del usuario
+     */
+    public void reenviarEmailConfirmacion(String correoElectronico) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByCorreoElectronico(correoElectronico);
+
+        if (usuarioOpt.isEmpty()) {
+            throw new RuntimeException("No existe una cuenta con ese correo electrónico");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        // Verificar que la cuenta no esté ya activada
+        if (usuario.getCuentaActiva()) {
+            throw new RuntimeException("Esta cuenta ya está activada. Puedes iniciar sesión directamente.");
+        }
+
+        // Generar nuevo token de confirmación
+        String nuevoToken = UUID.randomUUID().toString();
+        usuario.setTokenRecuperacion(nuevoToken);
+        usuarioRepository.save(usuario);
+
+        // Enviar nuevo email
+        emailService.enviarEmailConfirmacion(
+                correoElectronico,
+                usuario.getNombreCompleto(),
+                nuevoToken);
+    }
 }

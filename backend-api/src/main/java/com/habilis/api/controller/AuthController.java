@@ -298,4 +298,20 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new AuthResponse(false, e.getMessage()));
         }
     }
+
+    /**
+     * POST /api/auth/reenviar-confirmacion
+     * Reenviar email de confirmación (genera nuevo token)
+     */
+    @PostMapping("/reenviar-confirmacion")
+    public ResponseEntity<AuthResponse> reenviarConfirmacion(@RequestParam String email) {
+        try {
+            usuarioService.reenviarEmailConfirmacion(email);
+            return ResponseEntity.ok(new AuthResponse(
+                    true,
+                    "Nuevo código de confirmación enviado. Revisa tu correo."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new AuthResponse(false, e.getMessage()));
+        }
+    }
 }

@@ -133,16 +133,46 @@
 
         async function reenviarCorreo() {
             const btn = document.getElementById('btnReenviar');
+            const originalText = btn.textContent;
+
+            // Ask for email address
+            const email = prompt('Ingresa tu correo electrónico para reenviar el código:');
+
+            if (!email) {
+                return; // User cancelled
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Por favor ingresa un correo electrónico válido');
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = '📨 Enviando...';
 
-            // Por ahora, mostrar mensaje
-            showError('Función de reenvío aún no implementada. Por favor, regístrate nuevamente si necesitas un nuevo código.');
+            try {
+                const response = await fetch(`${API_BASE}/auth/reenviar-confirmacion?email=${encodeURIComponent(email)}`, {
+                    method: 'POST'
+                });
 
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.textContent = '📨 Reenviar Código';
-            }, 3000);
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('✅ Nuevo código enviado a tu correo electrónico');
+                } else {
+                    showError(data.message || 'No se pudo enviar el código. Verifica tu email.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error de conexión con el servidor');
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }, 3000);
+            }
         }
     </script>
 </body>
