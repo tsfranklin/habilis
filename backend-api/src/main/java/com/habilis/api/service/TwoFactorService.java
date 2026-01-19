@@ -6,6 +6,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Servicio para manejar autenticación de dos factores (2FA) con TOTP
@@ -24,7 +26,18 @@ public class TwoFactorService {
     private final GoogleAuthenticator googleAuthenticator;
 
     public TwoFactorService() {
-        this.googleAuthenticator = new GoogleAuthenticator();
+        // Configuración con ventana de tiempo ampliada para mejor compatibilidad
+        GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder configBuilder = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder();
+
+        GoogleAuthenticatorConfig config = configBuilder
+                .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
+                .setWindowSize(5) // ±150 segundos de tolerancia
+                .setCodeDigits(6)
+                .build();
+
+        this.googleAuthenticator = new GoogleAuthenticator(config);
+
+        System.out.println("✅ TwoFactorService inicializado - ventana: ±150 segundos");
     }
 
     /**
@@ -34,7 +47,9 @@ public class TwoFactorService {
      */
     public String generarSecreto() {
         GoogleAuthenticatorKey key = googleAuthenticator.createCredentials();
-        return key.getKey();
+        String secreto = key.getKey();
+        System.out.println("🔑 Secreto generado - longitud: " + secreto.length());
+        return secreto;
     }
 
     /**
@@ -46,26 +61,23 @@ public class TwoFactorService {
      */
     public String generarCodigoQR(String email, String secreto) {
         try {
-            // Generar URL otpauth://
             String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL(
-                    "HABILIS", // Issuer (nombre de la app)
-                    email, // Account name
+                    "HABILIS",
+                    email,
                     new GoogleAuthenticatorKey.Builder(secreto).build());
 
-            // Generar código QR como imagen
+            System.out.println("📱 QR generado para: " + email);
+
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(
                     otpAuthURL,
                     BarcodeFormat.QR_CODE,
-                    300, // Ancho
-                    300 // Alto
-            );
+                    300,
+                    300);
 
-            // Convertir a imagen PNG
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
 
-            // Convertir a Base64
             byte[] imageBytes = outputStream.toByteArray();
             return Base64.getEncoder().encodeToString(imageBytes);
 
@@ -82,20 +94,36 @@ public class TwoFactorService {
      * @return true si el código es válido, false si no
      */
     public boolean verificarCodigo(String secreto, int codigo) {
-        return googleAuthenticator.authorize(secreto, codigo);
+        long ventanaActual = System.currentTimeMillis() / 30000;
+        boolean resultado = googleAuthenticator.authorize(secreto, codigo);
+
+        System.out.println("🔐 Verificación 2FA:");
+        System.out.println("    Código: " + codigo);
+        System.out.println("    Ventana: " + ventanaActual);
+        System.out.println("    Resultado: " + (resultado ? "✅ VÁLIDO" : "❌ INVÁLIDO"));
+
+        if (!resultado) {
+            // Generar el código correcto para debugging
+            int codigoCorrecto = googleAuthenticator.getTotpPassword(secreto);
+            System.out.println("    Código esperado: " + codigoCorrecto);
+        }
+
+        return resultado;
     }
 
     /**
      * Verificar código TOTP con ventana de tiempo ampliada
-     * Útil para dar margen de error en caso de desincronización de relojes
-     * 
-     * @param secreto Secreto BASE32 del usuario
-     * @param codigo  Código de 6 dígitos
-     * @param ventana Número de intervalos de 30 segundos a verificar (por defecto:
-     *                1)
-     * @return true si el código es válido, false si no
      */
     public boolean verificarCodigoConVentana(String secreto, int codigo, int ventana) {
-        return googleAuthenticator.authorize(secreto, codigo, ventana);
+        long ventanaActual = System.currentTimeMillis() / 30000;
+        boolean resultado = googleAuthenticator.authorize(secreto, codigo, ventana);
+
+        System.out.println("🔐 Verificación 2FA (ventana " + ventana + "):");
+        System.out.println("    Código: " + codigo);
+        System.out.println("    Ventana: " + ventanaActual);
+        System.out.println("    Tolerancia: ±" + (ventana * 30) + "s");
+        System.out.println("    Resultado: " + (resultado ? "✅ VÁLIDO" : "❌ INVÁLIDO"));
+
+        return resultado;
     }
 }

@@ -145,7 +145,7 @@ public class UsuarioService {
         boolean codigoValido = twoFactorService.verificarCodigoConVentana(
                 usuario.getTwoFactorSecret(),
                 codigo,
-                1 // Ventana de 1 intervalo (30 segundos antes/después)
+                5 // Ventana de 5 intervalos (±150 segundos) para mejor tolerancia
         );
 
         if (codigoValido) {
