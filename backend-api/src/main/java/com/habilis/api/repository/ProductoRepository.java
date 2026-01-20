@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -44,15 +45,25 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
         List<Producto> findProductosDisponibles();
 
         /**
-         * Búsqueda avanzada por nombre y/o categoría
+         * Búsqueda avanzada con múltiples criterios (todos opcionales)
          * 
-         * @param nombre      Texto a buscar en el nombre
+         * @param nombre      Texto a buscar en el nombre (puede ser null)
          * @param categoriaId ID de la categoría (puede ser null)
-         * @return Lista de productos que coinciden
+         * @param precioMin   Precio mínimo (puede ser null)
+         * @param precioMax   Precio máximo (puede ser null)
+         * @param disponible  Solo productos con stock > 0 (puede ser null)
+         * @return Lista de productos que coinciden con los criterios
          */
         @Query("SELECT p FROM Producto p WHERE " +
                         "(:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
-                        "(:categoriaId IS NULL OR p.categoria.id = :categoriaId)")
-        List<Producto> buscarProductos(@Param("nombre") String nombre,
-                        @Param("categoriaId") Long categoriaId);
+                        "(:categoriaId IS NULL OR p.categoria.id = :categoriaId) AND " +
+                        "(:precioMin IS NULL OR p.precio >= :precioMin) AND " +
+                        "(:precioMax IS NULL OR p.precio <= :precioMax) AND " +
+                        "(:disponible IS NULL OR (:disponible = true AND p.stock > 0) OR (:disponible = false))")
+        List<Producto> buscarConFiltros(
+                        @Param("nombre") String nombre,
+                        @Param("categoriaId") Long categoriaId,
+                        @Param("precioMin") BigDecimal precioMin,
+                        @Param("precioMax") BigDecimal precioMax,
+                        @Param("disponible") Boolean disponible);
 }

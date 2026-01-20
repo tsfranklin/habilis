@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,8 +64,28 @@ public class ProductoController {
     }
 
     /**
+     * GET /api/productos/buscar-filtros
+     * Búsqueda avanzada con múltiples criterios (todos opcionales)
+     * Ejemplo:
+     * /api/productos/buscar-filtros?nombre=puzzle&categoriaId=1&precioMin=10&precioMax=50&disponible=true
+     */
+    @GetMapping("/buscar-filtros")
+    public ResponseEntity<List<Producto>> buscarConFiltros(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) BigDecimal precioMin,
+            @RequestParam(required = false) BigDecimal precioMax,
+            @RequestParam(required = false) Boolean disponible) {
+
+        List<Producto> productos = productoService.buscarConFiltros(
+                nombre, categoriaId, precioMin, precioMax, disponible);
+
+        return ResponseEntity.ok(productos);
+    }
+
+    /**
      * GET /api/productos/buscar?nombre=xxx
-     * Buscar productos por nombre (público)
+     * Búsqueda simple por nombre (público) - DEPRECATED, usar /buscar-filtros
      */
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String nombre) {

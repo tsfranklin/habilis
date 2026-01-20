@@ -2,14 +2,18 @@ package com.habilis.api.controller;
 
 import com.habilis.api.dto.PedidoRequest;
 import com.habilis.api.entity.Pedido;
+import com.habilis.api.service.PdfService;
 import com.habilis.api.service.PedidoService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +26,11 @@ import java.util.Map;
 public class PedidoController {
 
     private final PedidoService pedidoService;
+    private final PdfService pdfService;
 
-    public PedidoController(PedidoService pedidoService) {
+    public PedidoController(PedidoService pedidoService, PdfService pdfService) {
         this.pedidoService = pedidoService;
+        this.pdfService = pdfService;
     }
 
     /**
@@ -311,5 +317,48 @@ public class PedidoController {
 
         Map<String, Object> estadisticas = pedidoService.obtenerEstadisticasUsuario(userId);
         return ResponseEntity.ok(estadisticas);
+    }
+
+    /**
+     * GET /api/pedidos/{id}/factura
+     * Descargar factura en PDF del pedido
+     * Los usuarios solo pueden descargar sus propias facturas
+     */
+    @GetMapping("/{id}/factura")
+    public ResponseEntity<byte[]> descargarFactura(
+            @PathVariable Long id,
+            HttpSession session) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        String tipoUsuario = (String) session.getAttribute("userRole");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Pedido pedido = pedidoService.buscarPorId(id);
+
+            // Verificar que el usuario puede descargar esta factura
+            if (!"ADMIN".equals(tipoUsuario) && !pedido.getUsuario().getId().equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Generar PDF
+            byte[] pdfBytes = pdfService.generarFacturaPedido(id);
+
+            // Configurar headers para descarga
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "factura_pedido_" + id + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

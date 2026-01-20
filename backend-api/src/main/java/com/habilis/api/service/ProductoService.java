@@ -165,4 +165,21 @@ public class ProductoService {
         Producto producto = buscarPorId(id);
         return producto.getStock() >= cantidadRequerida;
     }
+
+    /**
+     * Búsqueda avanzada de productos con filtros múltiples
+     * Todos los parámetros son opcionales (pueden ser null)
+     * 
+     * @param nombre      Buscar por nombre (parcial, insensible a mayúsculas)
+     * @param categoriaId Filtrar por categoría
+     * @param precioMin   Precio mínimo
+     * @param precioMax   Precio máximo
+     * @param disponible  true = solo con stock, false = todos, null = todos
+     * @return Lista de productos que cumplen los criterios
+     */
+    public List<Producto> buscarConFiltros(String nombre, Long categoriaId,
+            BigDecimal precioMin, BigDecimal precioMax,
+            Boolean disponible) {
+        return productoRepository.buscarConFiltros(nombre, categoriaId, precioMin, precioMax, disponible);
+    }
 }

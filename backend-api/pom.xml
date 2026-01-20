@@ -68,11 +68,19 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         
-        <!-- Google Authenticator para TOTP (2FA) -->
+        <!-- TOTP Library para 2FA (más simple y transparente) -->
         <dependency>
-            <groupId>com.warrenstrange</groupId>
-            <artifactId>googleauth</artifactId>
-            <version>1.5.0</version>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+        
+        <!-- iText7 para generación de PDFs -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
         </dependency>
         
         <!-- ZXing para generar códigos QR -->

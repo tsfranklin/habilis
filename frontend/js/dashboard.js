@@ -151,9 +151,14 @@ async function loadOrders() {
                         </div>
                     `).join('')}
                 </div>
-                ${order.estado === 'PENDIENTE' ? `
-                    <button onclick="cancelOrder(${order.id})" class="btn btn-danger btn-sm">Cancelar Pedido</button>
-                ` : ''}
+                <div class="order-actions">
+                    <button onclick="downloadInvoice(${order.id})" class="btn btn-primary btn-sm">
+                        📄 Descargar Factura
+                    </button>
+                    ${order.estado === 'PENDIENTE' ? `
+                        <button onclick="cancelOrder(${order.id})" class="btn btn-danger btn-sm">Cancelar Pedido</button>
+                    ` : ''}
+                </div>
             </div>
         `).join('');
     } catch (error) {
