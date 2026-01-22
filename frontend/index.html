@@ -4,214 +4,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HÁBILIS - Kits educativos mensuales que desconectan a tus hijos de las pantallas">
-    <title>HÁBILIS | El Netflix de las Manualidades</title>
+    <title>HÁBILIS | El 'Netflix' de las manualidades sin pantallas</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
+
+    <!-- Navbar Profesional -->
     <nav class="navbar">
-        <a href="index.html" class="logo">🧩 HÁBILIS <span>Makers</span></a>
-        <div class="nav-links" id="navLinks">
-            <a href="#catalogo">Catálogo</a>
-            <a href="login.html">Iniciar Sesión</a>
-            <a href="register.html" class="btn btn-primary">Registrarse</a>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shapes"></i> HÁBILIS
+            </a>
+            <div class="nav-links" id="navMenu">
+                <a href="#metodo">El Método</a>
+                <a href="#edades">Edades</a>
+                <a href="#mision">Nuestra Misión</a>
+                <div id="authButtons" class="auth-buttons">
+                    <a href="login.html" class="btn-text">Entrar</a>
+                    <a href="register.html" class="btn btn-primary">Empezar</a>
+                </div>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <header class="hero">
-        <h1>Manos que piensan, mentes que crean</h1>
-        <p>El sistema de suscripción que desconecta a tus hijos de las pantallas<br>y conecta su creatividad con el
-            mundo real.</p>
-        <div style="margin-top: 2rem;">
-            <a href="#catalogo" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Ver Kits
-                Disponibles</a>
-            <a href="register.html" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">Empezar
-                Ahora</a>
+        <div class="hero-content">
+            <span class="badge-new">✨ Basado en Piaget y Gardner</span>
+            <h1>Menos Pantallas.<br>Más <span class="highlight">Habilidades Reales</span>.</h1>
+            <p>Suscripciones mensuales de juego tangible diseñadas para despertar la inteligencia natural de tu hijo
+                (3-13 años).</p>
+            <div class="hero-cta">
+                <a href="catalog.html" class="btn btn-primary btn-lg">Descubrir Kits Educativos</a>
+                <p class="small-text">🔒 100% Garantía de Satisfacción</p>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1596464716127-f9a805906124?auto=format&fit=crop&w=800&q=80"
+                alt="Niño jugando concentrado">
         </div>
     </header>
 
-    <main class="container" id="catalogo">
-        <!-- Statistics Section -->
-        <div class="stats-grid" style="margin-bottom: 3rem;">
-            <div class="stat-card">
-                <span class="stat-icon">🎯</span>
-                <div class="stat-info">
-                    <div class="stat-value">3-13</div>
-                    <div class="stat-label">Años de edad</div>
-                </div>
+    <!-- Trust Bar -->
+    <section class="trust-bar">
+        <div class="trust-item">
+            <i class="fas fa-brain"></i>
+            <span>Pedagogía Montessori</span>
+        </div>
+        <div class="trust-item">
+            <i class="fas fa-tree"></i>
+            <span>Materiales Sostenibles</span>
+        </div>
+        <div class="trust-item">
+            <i class="fas fa-ban"></i>
+            <span>0% Pantallas</span>
+        </div>
+        <div class="trust-item">
+            <i class="fas fa-truck"></i>
+            <span>Envíos Gratis España</span>
+        </div>
+    </section>
+
+    <!-- Cómo funciona HÁBILIS -->
+    <section class="how-it-works" id="metodo">
+        <h2 class="section-title">Cómo funciona HÁBILIS</h2>
+        <p class="section-subtitle">El antídoto a las pantallas en 3 pasos simples</p>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">1</div>
+                <h3>Explora el Catálogo</h3>
+                <p>Descubre kits diseñados por pedagogos. Cada uno desarrolla <strong>habilidades específicas</strong>
+                    según la edad.</p>
             </div>
-            <div class="stat-card">
-                <span class="stat-icon">📦</span>
-                <div class="stat-info">
-                    <div class="stat-value">12</div>
-                    <div class="stat-label">Kits anuales</div>
-                </div>
+            <div class="step-card">
+                <div class="step-icon">2</div>
+                <h3>Recibe la Misión</h3>
+                <p>Tu pedido llega con todos los materiales. Sin listas de la compra. <strong>Abrir y jugar</strong>.
+                </p>
             </div>
-            <div class="stat-card">
-                <span class="stat-icon">✨</span>
-                <div class="stat-info">
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Sin pantallas</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-icon">🧠</span>
-                <div class="stat-info">
-                    <div class="stat-value">+50</div>
-                    <div class="stat-label">Habilidades</div>
-                </div>
+            <div class="step-card">
+                <div class="step-icon">3</div>
+                <h3>Desconecta y Conecta</h3>
+                <p>Ellos desarrollan "Deep Work" (concentración) mientras tú disfrutas viéndoles <strong>crear sin
+                        pantallas</strong>.</p>
             </div>
         </div>
+    </section>
 
-        <h2 class="text-center" style="color: var(--primary-color); margin-bottom: 1rem; font-size: 2rem;">
-            Nuestros Kits Educativos
-        </h2>
-        <p class="text-center" style="margin-bottom: 2rem; color: #666;">
-            Cada mes, un nuevo reto para desarrollar motricidad fina, concentración y creatividad
-        </p>
+    <!-- Kits por Edades -->
+    <section class="ages-section" id="edades">
+        <h2 class="section-title">Una etapa, una caja</h2>
+        <p class="section-subtitle">Adaptamos el contenido al cerebro de tu hijo, no al revés.</p>
 
-        <!-- Category Filter -->
-        <div class="text-center" style="margin-bottom: 2rem;">
-            <select id="filtroCategoria" onchange="cargarKits()"
-                style="padding: 0.75rem; border-radius: var(--radius); border: 2px solid var(--primary-color);">
-                <option value="">Todas las Categorías</option>
-            </select>
-        </div>
-
-        <!-- Products Grid -->
-        <div id="listaKits" class="grid-kits">
-            <p class="loading">Cargando kits educativos...</p>
-        </div>
-
-        <!-- Mission Section -->
-        <div class="card"
-            style="margin-top: 3rem; background: linear-gradient(135deg, var(--primary-color) 0%, #34495e 100%); color: white;">
-            <h2 style="color: white;">Nuestra Misión</h2>
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
-                <div>
-                    <h3 style="color: var(--secondary-color);">🎯 Motricidad Fina</h3>
-                    <p>Desarrollamos habilidades manuales a través de actividades prácticas y creativas.</p>
+        <div class="kits-grid" id="listaKits">
+            <!-- Hardcoded examples - Real products loaded from backend in catalog.html -->
+            <article class="kit-card">
+                <div class="kit-img-container">
+                    <img src="https://images.unsplash.com/photo-1515488042361-25f468213b6e?auto=format&fit=crop&w=500&q=60"
+                        alt="Exploradores">
+                    <span class="age-badge">3-5 Años</span>
                 </div>
-                <div>
-                    <h3 style="color: var(--secondary-color);">🧠 Concentración</h3>
-                    <p>Fomentamos el "Deep Work" mediante retos que requieren atención sostenida.</p>
+                <div class="kit-content">
+                    <h3>Exploradores</h3>
+                    <p>Motricidad fina, colores y lógica básica. Puzzles, construcciones y manualidades adaptadas.</p>
+                    <a href="catalog.html" class="link-arrow">Ver Productos <i class="fas fa-arrow-right"></i></a>
                 </div>
-                <div>
-                    <h3 style="color: var(--secondary-color);">✨ Creatividad</h3>
-                    <p>Estimulamos la imaginación con materiales tangibles y proyectos únicos.</p>
-                </div>
-            </div>
-        </div>
-    </main>
+            </article>
 
+            <article class="kit-card">
+                <div class="kit-img-container">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=500&q=60"
+                        alt="Ingenieros">
+                    <span class="age-badge">6-9 Años</span>
+                </div>
+                <div class="kit-content">
+                    <h3>Ingenieros</h3>
+                    <p>Mecánica, causas y efectos. STEAM real. Proyectos de construcción y experimentos.</p>
+                    <a href="catalog.html" class="link-arrow">Ver Productos <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="kit-card">
+                <div class="kit-img-container">
+                    <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=500&q=60"
+                        alt="Artesanos">
+                    <span class="age-badge">10-13 Años</span>
+                </div>
+                <div class="kit-content">
+                    <h3>Artesanos</h3>
+                    <p>Proyectos complejos y herramientas reales. Carpintería, electrónica y diseño avanzado.</p>
+                    <a href="catalog.html" class="link-arrow">Ver Productos <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Mission Banner -->
+    <section class="mission-banner" id="mision">
+        <div class="mission-text">
+            <h2>El Antídoto a la Tablet</h2>
+            <p>"El uso excesivo de pantallas reduce la materia blanca del cerebro en áreas del lenguaje y la
+                alfabetización".</p>
+            <p><strong>En HÁBILIS no vendemos juguetes. Vendemos salud cognitiva.</strong></p>
+            <a href="catalog.html" class="btn btn-white btn-lg">Únete al movimiento</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2025 HÁBILIS - Habilidades reales para un futuro real.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Tecnología para salir de la tecnología</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="fas fa-shapes"></i> HÁBILIS</h3>
+                <p>Habilidades reales para un futuro real.</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Educación diferente sin pantallas.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navegación</h4>
+                <a href="catalog.html">Catálogo</a>
+                <a href="login.html">Iniciar Sesión</a>
+                <a href="register.html">Registrarse</a>
+            </div>
+            <div class="footer-links">
+                <h4>Soporte</h4>
+                <a href="#">Centro de Ayuda</a>
+                <a href="#">Envíos y Devoluciones</a>
+                <a href="#">Contacto</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacidad</a>
+                <a href="#">Términos de Uso</a>
+                <a href="#">Cookies</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 HÁBILIS Education S.L. - Proyecto Académico</p>
+        </div>
     </footer>
 
-    <script>
-        const API_BASE = 'http://localhost:8080/api';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            verificarSesion();
-            cargarCategoriasFiltro();
-            cargarKits();
-        });
-
-        // Verificar sesión y mostrar menú apropiado
-        async function verificarSesion() {
-            const nav = document.getElementById('navLinks');
-            try {
-                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
-                if (response.ok) {
-                    const user = await response.json();
-                    let menu = `<span style="color: white;">Hola, ${user.nombreCompleto}</span>`;
-                    if (user.tipoUsuario === 'ADMIN') {
-                        menu += `<a href="admin-dashboard.html" class="btn btn-secondary">Panel Admin</a>`;
-                    } else {
-                        menu += `<a href="user-dashboard.html">Mi Dashboard</a>`;
-                    }
-                    menu += `<a href="catalog.html">Ver Catálogo</a>`;
-                    menu += `<a href="#" onclick="logout()">Cerrar Sesión</a>`;
-                    nav.innerHTML = menu;
-                }
-            } catch (e) {
-                // Usuario no logueado, mantener menú por defecto
-            }
-        }
-
-        async function cargarCategoriasFiltro() {
-            try {
-                const res = await fetch(`${API_BASE}/categorias`);
-                const cats = await res.json();
-                const select = document.getElementById('filtroCategoria');
-                cats.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat.id;
-                    opt.textContent = cat.nombre;
-                    select.appendChild(opt);
-                });
-            } catch (e) {
-                console.error('Error cargando categorías:', e);
-            }
-        }
-
-        async function cargarKits() {
-            const contenedor = document.getElementById('listaKits');
-            const catId = document.getElementById('filtroCategoria').value;
-
-            try {
-                const url = catId ? `${API_BASE}/productos/categoria/${catId}` : `${API_BASE}/productos`;
-                const res = await fetch(url);
-                const kits = await res.json();
-
-                if (kits.length === 0) {
-                    contenedor.innerHTML = '<p class="empty-message">No hay kits disponibles en esta categoría</p>';
-                    return;
-                }
-
-                contenedor.innerHTML = kits.map(kit => `
-                    <div class="kit-card">
-                        <div class="product-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <span style="font-size: 4rem;">${kit.imagenUrl || '📦'}</span>
-                        </div>
-                        <div class="kit-info">
-                            <span class="badge badge-info" style="font-size: 0.75rem; margin-bottom: 0.5rem;">
-                                ${kit.categoria ? kit.categoria.nombre : 'General'}
-                            </span>
-                            <h3 style="margin: 0.5rem 0; color: var(--primary-color);">${kit.nombre}</h3>
-                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">${kit.descripcion.substring(0, 100)}...</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <span class="kit-price">€${kit.precio.toFixed(2)}</span>
-                                <span class="product-stock ${kit.stock > 0 ? 'in-stock' : 'out-stock'}">
-                                    ${kit.stock > 0 ? `Stock: ${kit.stock}` : 'Agotado'}
-                                </span>
-                            </div>
-                            ${kit.stock > 0 ? `
-                                <a href="catalog.html" class="btn btn-primary" style="width: 100%; text-decoration: none; display: block;">
-                                    Ver Más Detalles
-                                </a>
-                            ` : `
-                                <button class="btn btn-secondary" style="width: 100%;" disabled>Sin Stock</button>
-                            `}
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error('Error:', e);
-                contenedor.innerHTML = '<p class="error-message">Error cargando kits</p>';
-            }
-        }
-
-        async function logout() {
-            await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
-            window.location.reload();
-        }
-    </script>
-    <script src="js/navbar.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

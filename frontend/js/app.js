@@ -1,118 +1,85 @@
-// Configuración de la API
-const API_URL = 'http://localhost:8080';
+// ========================================
+// HÁBILIS - App.js Profesional
+// Lógica para index.html
+// ========================================
 
-/**
- * Función para probar el endpoint /api/health
- */
-async function testHealth() {
-    const responseDiv = document.getElementById('health-response');
-    responseDiv.textContent = 'Conectando...';
-    responseDiv.className = 'response-box';
-    responseDiv.style.display = 'block';
+const API_BASE_URL = 'http://localhost:8080/api';
 
-    try {
-        const response = await fetch(`${API_URL}/api/health`);
-
-        if (response.ok) {
-            const data = await response.json();
-            responseDiv.textContent = JSON.stringify(data, null, 2);
-            responseDiv.className = 'response-box success';
-            updateBackendStatus(true);
-        } else {
-            responseDiv.textContent = `Error: ${response.status} - ${response.statusText}`;
-            responseDiv.className = 'response-box error';
-            updateBackendStatus(false);
-        }
-    } catch (error) {
-        responseDiv.textContent = `Error de conexión: ${error.message}\n\nAsegúrate de que el backend está ejecutándose en ${API_URL}`;
-        responseDiv.className = 'response-box error';
-        updateBackendStatus(false);
-    }
-}
-
-/**
- * Función para probar el endpoint /api/welcome
- */
-async function testWelcome() {
-    const responseDiv = document.getElementById('welcome-response');
-    responseDiv.textContent = 'Conectando...';
-    responseDiv.className = 'response-box';
-    responseDiv.style.display = 'block';
-
-    try {
-        const response = await fetch(`${API_URL}/api/welcome`);
-
-        if (response.ok) {
-            const data = await response.json();
-            responseDiv.textContent = JSON.stringify(data, null, 2);
-            responseDiv.className = 'response-box success';
-            updateBackendStatus(true);
-        } else {
-            responseDiv.textContent = `Error: ${response.status} - ${response.statusText}`;
-            responseDiv.className = 'response-box error';
-            updateBackendStatus(false);
-        }
-    } catch (error) {
-        responseDiv.textContent = `Error de conexión: ${error.message}\n\nAsegúrate de que el backend está ejecutándose en ${API_URL}`;
-        responseDiv.className = 'response-box error';
-        updateBackendStatus(false);
-    }
-}
-
-/**
- * Actualizar estado del backend en el panel de sistema
- */
-function updateBackendStatus(isOnline) {
-    const backendStatus = document.getElementById('backend-status');
-    const dbStatus = document.getElementById('db-status');
-
-    if (isOnline) {
-        backendStatus.textContent = '● Online';
-        backendStatus.className = 'status-value status-online';
-        // Si el backend está online, asumimos que la BD también
-        dbStatus.textContent = '● Online';
-        dbStatus.className = 'status-value status-online';
-    } else {
-        backendStatus.textContent = '● Offline';
-        backendStatus.className = 'status-value status-offline';
-        dbStatus.textContent = '● Desconocido';
-        dbStatus.className = 'status-value status-offline';
-    }
-}
-
-/**
- * Verificar estado del sistema al cargar la página
- */
-async function checkSystemStatus() {
-    try {
-        const response = await fetch(`${API_URL}/api/health`);
-        updateBackendStatus(response.ok);
-    } catch (error) {
-        updateBackendStatus(false);
-    }
-}
-
-/**
- * Smooth scroll para navegación
- */
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificar estado del sistema
-    checkSystemStatus();
-
-    // Smooth scroll para los enlaces de navegación
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    console.log('🧩 HÁBILIS Frontend cargado correctamente');
-    console.log('📡 API URL:', API_URL);
+    verificarSesion();
 });
+
+// ========================================
+// VERIFICAR SESIÓN Y MOSTRAR NAVBAR DINÁMICO
+// ========================================
+
+async function verificarSesion() {
+    const authContainer = document.getElementById('authButtons');
+    if (!authContainer) return; // Solo ejecutar en index.html
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const user = await response.json();
+
+            // Usuario logueado: Mostrar saludo y botón salir
+            const primerNombre = user.nombreCompleto.split(' ')[0];
+
+            authContainer.innerHTML = `
+                <a href="${user.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html'}" class="btn-text">
+                    👋 Hola, ${primerNombre}
+                </a>
+                <button onclick="logout()" class="btn btn-secondary btn-sm">Salir</button>
+            `;
+
+            // Si es admin, agregar botón extra
+            if (user.tipoUsuario === 'ADMIN') {
+                const adminBtn = document.createElement('a');
+                adminBtn.href = 'admin-dashboard.html';
+                adminBtn.className = 'btn btn-primary btn-sm';
+                adminBtn.textContent = 'Panel Admin';
+                adminBtn.style.marginLeft = '8px';
+                authContainer.appendChild(adminBtn);
+            }
+        }
+        // Si NO está logueado, dejamos los botones por defecto del HTML
+    } catch (error) {
+        console.log('Visitante anónimo');
+    }
+}
+
+// ========================================
+// LOGOUT
+// ========================================
+
+async function logout() {
+    try {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userRole');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        window.location.reload();
+    }
+}
+
+// ========================================
+// HAMBURGER MENU (Mobile)
+// ========================================
+
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('navMenu');
+
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+    });
+}

@@ -6,43 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Dashboard - HÁBILIS</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="dashboard-nav">
-        <div class="nav-brand">
-            <h1>🧩 HÁBILIS</h1>
-        </div>
-        <div class="nav-menu">
-            <a href="catalog.html" class="nav-link">📦 Catálogo</a>
-            <a href="#" class="nav-link active">🏠 Dashboard</a>
-            <a href="cart.html" class="nav-link">🛒 Carrito <span id="cartBadge" class="badge">0</span></a>
-            <div class="user-menu">
-                <span id="userName">Usuario</span>
-                <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+    <!-- Navbar Profesional -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shapes"></i> HÁBILIS
+            </a>
+            <div class="nav-links">
+                <a href="catalog.html" class="nav-link">
+                    <i class="fas fa-boxes"></i> Catálogo
+                </a>
+                <a href="user-dashboard.html" class="nav-link active">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="cart.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i> Carrito
+                </a>
+                <div class="user-menu">
+                    <span id="userName" style="font-weight: 600;">👤 Usuario</span>
+                    <button onclick="logout()" class="btn btn-logout">Salir</button>
+                </div>
             </div>
         </div>
     </nav>
 
+    <!-- Dashboard Container -->
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="dashboard-sidebar">
             <div class="sidebar-menu">
                 <a href="#overview" class="sidebar-link active" onclick="showSection('overview')">
-                    📊 Resumen
+                    <i class="fas fa-chart-line"></i> Resumen
                 </a>
                 <a href="#orders" class="sidebar-link" onclick="showSection('orders')">
-                    📦 Mis Pedidos
+                    <i class="fas fa-box"></i> Mis Pedidos
                 </a>
                 <a href="#security" class="sidebar-link" onclick="showSection('security')">
-                    🔒 Seguridad (2FA)
+                    <i class="fas fa-shield-alt"></i> Seguridad (2FA)
                 </a>
                 <a href="#profile" class="sidebar-link" onclick="showSection('profile')">
-                    👤 Perfil
+                    <i class="fas fa-user"></i> Perfil
                 </a>
             </div>
         </aside>
@@ -50,140 +57,159 @@
         <!-- Main Content -->
         <main class="dashboard-main">
             <!-- Overview Section -->
-            <section id="overview-section" class="dashboard-section">
-                <h2 class="section-title">Resumen de tu Cuenta</h2>
+            <section id="overview-section" class="dashboard-section" style="display: block;">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: var(--primary);">Resumen de tu Cuenta</h2>
 
+                <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon">📦</div>
-                        <div class="stat-info">
+                        <div class="stat-icon" style="color: var(--secondary);">📦</div>
+                        <div>
                             <div class="stat-value" id="totalOrders">-</div>
                             <div class="stat-label">Pedidos Totales</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-info">
+                        <div class="stat-icon" style="color: #ffc107;">⏳</div>
+                        <div>
                             <div class="stat-value" id="pendingOrders">-</div>
-                            <div class="stat-label">Pedidos Pendientes</div>
+                            <div class="stat-label">Pendientes</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-info">
+                        <div class="stat-icon" style="color: var(--accent);">✅</div>
+                        <div>
                             <div class="stat-value" id="completedOrders">-</div>
                             <div class="stat-label">Completados</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-info">
+                        <div class="stat-icon" style="color: var(--secondary);">💰</div>
+                        <div>
                             <div class="stat-value" id="totalSpent">-</div>
                             <div class="stat-label">Total Gastado</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="quick-actions">
-                    <h3>Acciones Rápidas</h3>
-                    <div class="action-buttons">
-                        <a href="catalog.html" class="action-card">
-                            <span class="action-icon">🛍️</span>
-                            <span class="action-text">Ver Catálogo</span>
+                <!-- Quick Actions -->
+                <div style="margin-top: 3rem;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary);">Acciones Rápidas</h3>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <a href="catalog.html" class="card"
+                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛍️</div>
+                            <div style="font-weight: 600; color: var(--primary);">Ver Catálogo</div>
                         </a>
-                        <a href="cart.html" class="action-card">
-                            <span class="action-icon">🛒</span>
-                            <span class="action-text">Mi Carrito</span>
+                        <a href="cart.html" class="card"
+                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛒</div>
+                            <div style="font-weight: 600; color: var(--primary);">Mi Carrito</div>
                         </a>
-                        <a href="#" onclick="showSection('orders')" class="action-card">
-                            <span class="action-icon">📋</span>
-                            <span class="action-text">Ver Pedidos</span>
+                        <a href="#" onclick="showSection('orders')" class="card"
+                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                            <div style="font-weight: 600; color: var(--primary);">Ver Pedidos</div>
                         </a>
                     </div>
                 </div>
             </section>
 
             <!-- Orders Section -->
-            <section id="orders-section" class="dashboard-section" style="display: none;">
-                <h2 class="section-title">Mis Pedidos</h2>
-
-                <div id="ordersContainer" class="orders-container">
+            <section id="orders-section" class="dashboard-section">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: var(--primary);">Mis Pedidos</h2>
+                <div id="ordersContainer">
                     <div class="loading">Cargando pedidos...</div>
                 </div>
             </section>
 
-            <!-- Security 2FA Section -->
-            <section id="security-section" class="dashboard-section" style="display: none;">
-                <h2 class="section-title">Seguridad - Autenticación de Dos Factores</h2>
+            <!-- Security Section (2FA) -->
+            <section id="security-section" class="dashboard-section">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary);">Seguridad (2FA)</h2>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">La autenticación de dos factores agrega una
+                    capa extra de seguridad a tu cuenta.</p>
 
-                <div class="security-status">
-                    <div class="security-card">
-                        <div class="security-header">
-                            <h3>Estado del 2FA</h3>
-                            <span id="2faStatus" class="badge">Cargando...</span>
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <div>
+                            <h3 style="margin-bottom: 0.5rem;">Estado de 2FA</h3>
+                            <span id="2faStatus" class="badge badge-warning">Desactivado</span>
                         </div>
-                        <p id="2faDescription">Cargando información...</p>
+                    </div>
+
+                    <p id="2faDescription" style="color: var(--text-light); margin-bottom: 2rem;">
+                        Aumenta la seguridad de tu cuenta activando la autenticación de dos factores.
+                    </p>
+
+                    <div id="2faMessage" class="alert" style="display: none;"></div>
+
+                    <!-- Enable 2FA -->
+                    <div id="enable2faContainer">
+                        <button onclick="enable2FA()" class="btn btn-primary">
+                            <i class="fas fa-shield-alt"></i> Activar 2FA
+                        </button>
+                    </div>
+
+                    <!-- QR Code Container -->
+                    <div id="qrCodeContainer" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;">Escanea este código QR</h4>
+                        <img id="qrCodeImage"
+                            style="max-width: 250px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 1.5rem;"
+                            alt="QR Code">
+                        <div class="form-group">
+                            <label for="verify2faCode">Ingresa el código de verificación</label>
+                            <input type="text" id="verify2faCode" placeholder="123456" maxlength="6" pattern="[0-9]{6}"
+                                style="max-width: 300px;">
+                        </div>
+                        <button onclick="verify2FAActivation()" class="btn btn-primary">Verificar y Activar</button>
+                    </div>
+
+                    <!-- Disable 2FA -->
+                    <div id="disable2faContainer" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;">Desactivar 2FA</h4>
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Para desactivar 2FA, ingresa tu
+                            contraseña:</p>
+                        <div class="form-group">
+                            <label for="disablePassword">Contraseña</label>
+                            <input type="password" id="disablePassword" placeholder="Tu contraseña"
+                                style="max-width: 300px;">
+                        </div>
+                        <button onclick="disable2FA()" class="btn btn-danger">Desactivar 2FA</button>
                     </div>
                 </div>
-
-                <!-- Enable 2FA -->
-                <div id="enable2faContainer" style="display: none;">
-                    <button onclick="enable2FA()" class="btn btn-primary">
-                        🔐 Activar Autenticación de Dos Factores
-                    </button>
-                </div>
-
-                <!-- QR Code Display -->
-                <div id="qrCodeContainer" style="display: none;" class="qr-container">
-                    <h3>Escanea este código QR</h3>
-                    <p>Usa Google Authenticator, Authy, o cualquier app compatible con TOTP</p>
-                    <img id="qrCodeImage" src="" alt="QR Code" class="qr-code">
-
-                    <div class="form-group">
-                        <label for="verify2faCode">Ingresa el código de 6 dígitos para activar:</label>
-                        <input type="text" id="verify2faCode" maxlength="6" pattern="[0-9]{6}" placeholder="123456">
-                    </div>
-                    <button onclick="verify2FAActivation()" class="btn btn-success">Verificar y Activar</button>
-                </div>
-
-                <!-- Disable 2FA -->
-                <div id="disable2faContainer" style="display: none;">
-                    <div class="form-group">
-                        <label for="disablePassword">Para desactivar, ingresa tu contraseña:</label>
-                        <input type="password" id="disablePassword" placeholder="Tu contraseña">
-                    </div>
-                    <button onclick="disable2FA()" class="btn btn-danger">
-                        🔓 Desactivar 2FA
-                    </button>
-                </div>
-
-                <div id="2faMessage" class="alert" style="display: none;"></div>
             </section>
 
             <!-- Profile Section -->
-            <section id="profile-section" class="dashboard-section" style="display: none;">
-                <h2 class="section-title">Mi Perfil</h2>
+            <section id="profile-section" class="dashboard-section">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: var(--primary);">Mi Perfil</h2>
 
-                <div class="profile-info">
-                    <div class="info-row">
-                        <span class="info-label">Nombre:</span>
-                        <span class="info-value" id="profileName">-</span>
+                <div class="card">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <p id="profileName" style="font-size: 1.125rem; color: var(--text-dark); font-weight: 600;">-
+                        </p>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Email:</span>
-                        <span class="info-value" id="profileEmail">-</span>
+
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <p id="profileEmail" style="font-size: 1.125rem; color: var(--text-dark);">-</p>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Teléfono:</span>
-                        <span class="info-value" id="profilePhone">-</span>
+
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <p id="profilePhone" style="font-size: 1.125rem; color: var(--text-dark);">-</p>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Tipo de Usuario:</span>
-                        <span class="info-value"><span id="profileType" class="badge">-</span></span>
+
+                    <div class="form-group">
+                        <label>Tipo de Usuario</label>
+                        <span id="profileType" class="badge badge-info">-</span>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Estado de Cuenta:</span>
-                        <span class="info-value"><span id="profileStatus" class="badge">-</span></span>
+
+                    <div class="form-group">
+                        <label>Estado de la Cuenta</label>
+                        <span id="profileStatus" class="badge badge-success">Activa</span>
                     </div>
                 </div>
             </section>

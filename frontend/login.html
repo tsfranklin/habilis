@@ -6,22 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - HÁBILIS</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="auth-page">
     <div class="auth-container">
         <div class="auth-box">
+            <!-- Header -->
             <div class="auth-header">
-                <h1 class="auth-logo">🧩 HÁBILIS</h1>
+                <a href="index.html" class="auth-logo">
+                    <i class="fas fa-shapes"></i> HÁBILIS
+                </a>
                 <p class="auth-subtitle">Desconectar para Reconectar</p>
             </div>
 
             <!-- Login Form -->
             <form id="loginForm" class="auth-form">
-                <h2 class="form-title">Iniciar Sesión</h2>
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">Iniciar Sesión</h2>
 
                 <div class="form-group">
                     <label for="loginEmail">Correo Electrónico</label>
@@ -41,7 +42,7 @@
                     <a href="forgot-password.html" class="link-text">¿Olvidaste tu contraseña?</a>
                 </div>
 
-                <button type="submit" class="btn-auth btn-primary">
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                     <span class="btn-text">Iniciar Sesión</span>
                     <span class="btn-loader" style="display: none;">⏳</span>
                 </button>
@@ -52,46 +53,47 @@
 
             <!-- 2FA Form (hidden initially) -->
             <form id="twoFactorForm" class="auth-form" style="display: none;">
-                <h2 class="form-title">Verificación de Dos Factores</h2>
-                <p class="form-description">Ingresa el código de 6 dígitos de tu aplicación de autenticación</p>
+                <h2 style="font-size: 1.75rem; margin-bottom: 1rem; color: var(--primary);">Verificación de Dos Factores
+                </h2>
+                <p style="color: var(--text-light); margin-bottom: 1.5rem;">Ingresa el código de 6 dígitos de tu
+                    aplicación de autenticación</p>
 
                 <div class="form-group">
                     <label for="twoFactorCode">Código 2FA</label>
                     <input type="text" id="twoFactorCode" name="code" placeholder="123456" maxlength="6"
                         pattern="[0-9]{6}" required>
+                    <p class="form-help">El código cambia cada 30 segundos</p>
                 </div>
 
-                <input type="hidden" id="twoFactorUserId">
-
-                <button type="submit" class="btn-auth btn-primary">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
                     <span class="btn-text">Verificar Código</span>
                     <span class="btn-loader" style="display: none;">⏳</span>
                 </button>
 
-                <button type="button" class="btn-auth btn-secondary" onclick="cancel2FA()">
+                <button type="button" onclick="cancel2FA()" class="btn btn-secondary"
+                    style="width: 100%; margin-top: 0.75rem;">
                     Cancelar
                 </button>
 
                 <div id="twoFactorError" class="alert alert-error" style="display: none;"></div>
+                <div id="twoFactorAttempts" class="alert alert-warning" style="display: none;"></div>
             </form>
 
+            <!-- Footer -->
             <div class="auth-footer">
-                <p>¿No tienes cuenta? <a href="register.html" class="link-primary">Regístrate aquí</a></p>
+                <p style="color: var(--text-light);">
+                    ¿No tienes cuenta?
+                    <a href="register.html" class="link-primary">Regístrate gratis</a>
+                </p>
+                <p style="margin-top: 1rem;">
+                    <a href="index.html" class="link-text" style="font-size: 0.9375rem;">
+                        <i class="fas fa-arrow-left"></i> Volver al inicio
+                    </a>
+                </p>
             </div>
-        </div>
-
-        <div class="auth-features">
-            <h3>🎯 Por qué HÁBILIS</h3>
-            <ul class="features-list">
-                <li>✨ Kits educativos mensuales</li>
-                <li>🧠 Desarrollo de motricidad fina</li>
-                <li>🎨 Creatividad sin pantallas</li>
-                <li>🔒 Plataforma segura y confiable</li>
-            </ul>
         </div>
     </div>
 
-    <script src="js/navbar.js"></script>
     <script src="js/auth.js"></script>
 </body>
 

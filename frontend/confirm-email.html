@@ -4,174 +4,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmar Cuenta | HÁBILIS</title>
+    <title>Confirmar Email - HÁBILIS</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body>
-    <nav class="navbar">
-        <a href="index.html" class="logo">🧩 HÁBILIS</a>
-    </nav>
-
-    <div class="container" style="max-width: 600px; margin-top: 3rem;">
-        <div class="card">
-            <div class="text-center" style="margin-bottom: 2rem;">
-                <h1 style="color: var(--primary-color);">📧 Confirma tu Cuenta</h1>
-                <p>Hemos enviado un código de confirmación a tu correo electrónico</p>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <!-- Header -->
+            <div class="auth-header">
+                <a href="index.html" class="auth-logo">
+                    <i class="fas fa-shapes"></i> HÁBILIS
+                </a>
+                <p class="auth-subtitle">Activa tu cuenta</p>
             </div>
 
-            <div id="successMessage" class="alert alert-success" style="display: none;"></div>
-            <div id="errorMessage" class="alert alert-error" style="display: none;"></div>
+            <!-- Confirmation Message -->
+            <div class="auth-form">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary); text-align: center;">
+                    <i class="fas fa-envelope"
+                        style="color: var(--secondary); font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
+                    Confirma tu Correo Electrónico
+                </h2>
 
-            <form id="confirmForm">
-                <div class="form-group">
-                    <label for="confirmToken">Código de Confirmación</label>
-                    <input type="text" id="confirmToken" placeholder="Ej: da52427d-7a03-4262-ab65-dbb8574c8d96" required
-                        style="text-align: center; font-family: monospace;">
-                    <small class="form-help">Revisa tu correo electrónico y copia el código completo</small>
+                <div id="confirmMessage" class="alert alert-info">
+                    <p style="margin-bottom: 1rem;">Verificando tu cuenta...</p>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <span class="btn-text">Activar Cuenta</span>
-                    <span class="btn-loader" style="display: none;">⏳ Procesando...</span>
-                </button>
-            </form>
+                <div id="confirmSuccess" class="alert alert-success" style="display: none;">
+                    <p><strong>¡Cuenta activada!</strong></p>
+                    <p>Tu cuenta ha sido confirmada exitosamente.</p>
+                </div>
 
-            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
-                <p style="color: #666;">¿No recibiste el correo?</p>
-                <button onclick="reenviarCorreo()" class="btn btn-secondary" id="btnReenviar">
-                    📨 Reenviar Código
-                </button>
+                <div id="confirmError" class="alert alert-error" style="display: none;"></div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <p style="color: var(--text-light); margin-bottom: 1rem;">
+                        ¿No recibiste el correo?
+                    </p>
+                    <button onclick="reenviarCorreo()" class="btn btn-secondary">
+                        Reenviar Correo de Confirmación
+                    </button>
+                </div>
             </div>
 
-            <div style="text-align: center; margin-top: 1rem;">
-                <a href="login.html" style="color: var(--secondary-color);">Ya activé mi cuenta, ir al Login</a>
+            <!-- Footer -->
+            <div class="auth-footer">
+                <p style="color: var(--text-light);">
+                    <a href="login.html" class="link-primary">Ir al Login</a>
+                </p>
             </div>
-        </div>
-
-        <!-- Instructions Card -->
-        <div class="card" style="background-color: #f8f9fa; margin-top: 2rem;">
-            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">💡 ¿Cómo encontrar el código?</h3>
-            <ol style="color: #666; line-height: 1.8;">
-                <li>Revisa tu bandeja de entrada (y spam)</li>
-                <li>Busca un correo de <strong>HÁBILIS</strong></li>
-                <li>El código está en el cuerpo del mensaje</li>
-                <li>Cópialo completo y pégalo arriba</li>
-            </ol>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 HÁBILIS - Educación diferente</p>
-    </footer>
-
-    <script src="js/navbar.js"></script>
     <script>
-        const API_BASE = 'http://localhost:8080/api';
+        const API_BASE_URL = 'http://localhost:8080/api';
 
-        // Auto-fill token from URL if present
+        // Extraer token de la URL
         const urlParams = new URLSearchParams(window.location.search);
-        const tokenFromUrl = urlParams.get('token');
-        if (tokenFromUrl) {
-            document.getElementById('confirmToken').value = tokenFromUrl;
-            // Auto-submit if token in URL
-            setTimeout(() => {
-                document.getElementById('confirmForm').dispatchEvent(new Event('submit'));
-            }, 500);
+        const token = urlParams.get('token');
+
+        // Auto-confirmar al cargar la página
+        if (token) {
+            confirmarCuenta(token);
+        } else {
+            document.getElementById('confirmMessage').innerHTML =
+                '<p style="color: var(--danger);">Token de confirmación no proporcionado en la URL.</p>';
+            document.getElementById('confirmMessage').className = 'alert alert-error';
         }
 
-        document.getElementById('confirmForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const token = document.getElementById('confirmToken').value.trim();
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.querySelector('.btn-text').style.display = 'none';
-            submitBtn.querySelector('.btn-loader').style.display = 'inline';
-
+        async function confirmarCuenta(token) {
             try {
-                const response = await fetch(`${API_BASE}/auth/confirmar-email?token=${token}`, {
-                    method: 'POST'
+                const response = await fetch(`${API_BASE_URL}/auth/confirmar-email?token=${token}`, {
+                    method: 'GET'
                 });
 
-                const data = await response.json();
+                const data = await response.text();
 
-                if (data.success) {
-                    showSuccess('✅ ¡Cuenta activada exitosamente! Redirigiendo al login...');
+                if (response.ok) {
+                    document.getElementById('confirmMessage').style.display = 'none';
+                    document.getElementById('confirmSuccess').style.display = 'block';
+
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 2000);
+                    }, 3000);
                 } else {
-                    showError(data.message || 'Token inválido o expirado');
-                    submitBtn.disabled = false;
-                    submitBtn.querySelector('.btn-text').style.display = 'inline';
-                    submitBtn.querySelector('.btn-loader').style.display = 'none';
+                    document.getElementById('confirmMessage').style.display = 'none';
+                    document.getElementById('confirmError').innerHTML = `<p>${data || 'Error al confirmar la cuenta'}</p>`;
+                    document.getElementById('confirmError').style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showError('Error de conexión con el servidor');
-                submitBtn.disabled = false;
-                submitBtn.querySelector('.btn-text').style.display = 'inline';
-                submitBtn.querySelector('.btn-loader').style.display = 'none';
+                document.getElementById('confirmMessage').style.display = 'none';
+                document.getElementById('confirmError').innerHTML = '<p>Error de conexión. Por favor, inténtalo de nuevo más tarde.</p>';
+                document.getElementById('confirmError').style.display = 'block';
             }
-        });
-
-        function showSuccess(message) {
-            const el = document.getElementById('successMessage');
-            el.textContent = message;
-            el.style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-
-        function showError(message) {
-            const el = document.getElementById('errorMessage');
-            el.textContent = message;
-            el.style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
         }
 
         async function reenviarCorreo() {
-            const btn = document.getElementById('btnReenviar');
-            const originalText = btn.textContent;
-
-            // Ask for email address
-            const email = prompt('Ingresa tu correo electrónico para reenviar el código:');
-
-            if (!email) {
-                return; // User cancelled
-            }
-
-            // Validate email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showError('Por favor ingresa un correo electrónico válido');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = '📨 Enviando...';
+            const email = prompt("Por favor, introduce tu correo electrónico para reenviar el email de confirmación:");
+            if (!email) return;
 
             try {
-                const response = await fetch(`${API_BASE}/auth/reenviar-confirmacion?email=${encodeURIComponent(email)}`, {
-                    method: 'POST'
+                const response = await fetch(`${API_BASE_URL}/auth/reenviar-confirmacion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
                 });
 
-                const data = await response.json();
-
-                if (data.success) {
-                    showSuccess('✅ Nuevo código enviado a tu correo electrónico');
-                } else {
-                    showError(data.message || 'No se pudo enviar el código. Verifica tu email.');
-                }
+                const data = await response.text();
+                alert(data || 'Si el correo existe, se ha reenviado la confirmación.');
             } catch (error) {
-                console.error('Error:', error);
-                showError('Error de conexión con el servidor');
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }, 3000);
+                alert('Error al reenviar correo. Inténtalo de nuevo más tarde.');
             }
         }
     </script>

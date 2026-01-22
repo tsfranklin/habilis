@@ -6,21 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - HÁBILIS</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="auth-page">
     <div class="auth-container">
         <div class="auth-box">
+            <!-- Header -->
             <div class="auth-header">
-                <h1 class="auth-logo">🧩 HÁBILIS</h1>
+                <a href="index.html" class="auth-logo">
+                    <i class="fas fa-shapes"></i> HÁBILIS
+                </a>
                 <p class="auth-subtitle">Crea tu cuenta y comienza</p>
             </div>
 
+            <!-- Register Form -->
             <form id="registerForm" class="auth-form">
-                <h2 class="form-title">Registro</h2>
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">Registro</h2>
 
                 <div class="form-group">
                     <label for="registerName">Nombre Completo</label>
@@ -54,12 +56,12 @@
                         required>
                 </div>
 
-                <label class="checkbox-label">
+                <label class="checkbox-label" style="margin-bottom: 1.5rem;">
                     <input type="checkbox" name="terms" required>
                     <span>Acepto los <a href="#" class="link-text">términos y condiciones</a></span>
                 </label>
 
-                <button type="submit" class="btn-auth btn-primary">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
                     <span class="btn-text">Crear Cuenta</span>
                     <span class="btn-loader" style="display: none;">⏳</span>
                 </button>
@@ -68,19 +70,18 @@
                 <div id="registerSuccess" class="alert alert-success" style="display: none;"></div>
             </form>
 
+            <!-- Footer -->
             <div class="auth-footer">
-                <p>¿Ya tienes cuenta? <a href="login.html" class="link-primary">Inicia sesión aquí</a></p>
+                <p style="color: var(--text-light);">
+                    ¿Ya tienes cuenta?
+                    <a href="login.html" class="link-primary">Inicia sesión aquí</a>
+                </p>
+                <p style="margin-top: 1rem;">
+                    <a href="index.html" class="link-text" style="font-size: 0.9375rem;">
+                        <i class="fas fa-arrow-left"></i> Volver al inicio
+                    </a>
+                </p>
             </div>
-        </div>
-
-        <div class="auth-features">
-            <h3>🎁 ¿Qué incluyen los kits?</h3>
-            <ul class="features-list">
-                <li>📦 12 misiones anuales</li>
-                <li>🎨 Materiales didácticos premium</li>
-                <li>📘 Guías detalladas</li>
-                <li>🏆 Retos adaptados por edad</li>
-            </ul>
         </div>
     </div>
 

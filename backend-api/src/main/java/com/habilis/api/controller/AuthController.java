@@ -53,10 +53,20 @@ public class AuthController {
 
     /**
      * POST /api/auth/confirmar-email
+     * GET /api/auth/confirmar-email (para compatibilidad con enlaces de email)
      * Activar cuenta mediante token enviado por correo
      */
     @PostMapping("/confirmar-email")
-    public ResponseEntity<AuthResponse> confirmarEmail(@RequestParam String token) {
+    public ResponseEntity<AuthResponse> confirmarEmailPost(@RequestParam String token) {
+        return confirmarEmail(token);
+    }
+
+    @GetMapping("/confirmar-email")
+    public ResponseEntity<AuthResponse> confirmarEmailGet(@RequestParam String token) {
+        return confirmarEmail(token);
+    }
+
+    private ResponseEntity<AuthResponse> confirmarEmail(String token) {
         try {
             Usuario usuario = usuarioService.confirmarEmail(token);
             return ResponseEntity.ok(new AuthResponse(

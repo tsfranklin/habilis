@@ -6,76 +6,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin | HÁBILIS</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
+    <!-- Navbar Profesional Admin -->
     <nav class="navbar">
-        <a href="index.html" class="logo">🧩 HÁBILIS <span>Admin</span></a>
-        <div class="nav-links">
-            <a href="catalog.html">Ver Catálogo</a>
-            <a href="user-dashboard.html">Mi Perfil</a>
-            <a href="#" onclick="logout()">Cerrar Sesión</a>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shapes"></i> HÁBILIS
+                <span style="color: var(--danger); font-size: 0.875rem; font-weight: 600;">ADMIN</span>
+            </a>
+            <div class="nav-links">
+                <a href="catalog.html" class="nav-link">
+                    <i class="fas fa-boxes"></i> Catálogo Público
+                </a>
+                <a href="user-dashboard.html" class="nav-link">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a>
+                <button onclick="logout()" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="container">
-        <h1 style="color: var(--primary-color); margin-bottom: 2rem;">Panel de Administración</h1>
+    <main class="container" style="max-width: 1400px;">
+        <div style="margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem;">
+                <i class="fas fa-cog"></i> Panel de Administración
+            </h1>
+            <p style="color: var(--text-light); font-size: 1.125rem;">Gestiona productos, categorías y pedidos</p>
+        </div>
 
         <!-- Tab Navigation -->
-        <div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-            <button class="btn btn-primary" onclick="mostrarSeccion('productos')">Gestionar Productos</button>
-            <button class="btn btn-secondary" onclick="mostrarSeccion('categorias')">Gestionar Categorías</button>
-            <button class="btn btn-secondary" onclick="mostrarSeccion('pedidos')">Ver Pedidos</button>
+        <div style="display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="mostrarSeccion('productos')" id="tab-productos">
+                <i class="fas fa-box"></i> Productos
+            </button>
+            <button class="btn btn-secondary" onclick="mostrarSeccion('categorias')" id="tab-categorias">
+                <i class="fas fa-tags"></i> Categorías
+            </button>
+            <button class="btn btn-secondary" onclick="mostrarSeccion('pedidos')" id="tab-pedidos">
+                <i class="fas fa-shopping-bag"></i> Pedidos
+            </button>
         </div>
 
         <!-- SECTION: PRODUCTOS -->
         <section id="sec-productos">
-            <div class="card">
-                <h2>Crear/Editar Producto</h2>
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-plus-circle"></i> Crear/Editar Producto
+                </h2>
                 <form id="productoForm">
                     <input type="hidden" id="prodId">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                         <div class="form-group">
-                            <label>Nombre del Producto</label>
+                            <label for="prodNombre">Nombre del Producto</label>
                             <input type="text" id="prodNombre" placeholder="Ej: Kit de Robótica Nivel 1" required>
                         </div>
                         <div class="form-group">
-                            <label>Precio (€)</label>
+                            <label for="prodPrecio">Precio (€)</label>
                             <input type="number" id="prodPrecio" placeholder="29.99" required step="0.01" min="0">
                         </div>
                         <div class="form-group">
-                            <label>Categoría</label>
+                            <label for="prodCategoria">Categoría</label>
                             <select id="prodCategoria" required>
                                 <option value="" disabled selected>Seleccione categoría...</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Stock Disponible</label>
+                            <label for="prodStock">Stock Disponible</label>
                             <input type="number" id="prodStock" placeholder="50" required min="0">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Descripción</label>
+                        <label for="prodDesc">Descripción</label>
                         <textarea id="prodDesc" placeholder="Descripción pedagógica del kit..." rows="3"
                             required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>URL de Imagen (o emoji)</label>
+                        <label for="prodImagen">Imagen (emoji o URL)</label>
                         <input type="text" id="prodImagen" placeholder="📦 (emoji) o https://...">
                     </div>
-                    <button type="submit" class="btn btn-success">
-                        <span id="btnTexto">Crear Producto</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()" id="btnCancelar"
-                        style="display: none;">
-                        Cancelar
-                    </button>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> <span id="btnTexto">Crear Producto</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelarEdicion()" id="btnCancelar"
+                            style="display: none;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
                 </form>
             </div>
 
             <div class="card">
-                <h2>Listado de Productos</h2>
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-list"></i> Listado de Productos
+                </h2>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -100,30 +130,36 @@
 
         <!-- SECTION: CATEGORIAS -->
         <section id="sec-categorias" style="display: none;">
-            <div class="card">
-                <h2>Crear/Editar Categoría</h2>
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-plus-circle"></i> Crear/Editar Categoría
+                </h2>
                 <form id="categoriaForm">
                     <input type="hidden" id="catId">
                     <div class="form-group">
-                        <label>Nombre de la Categoría</label>
+                        <label for="catNombre">Nombre de la Categoría</label>
                         <input type="text" id="catNombre" placeholder="Ej: Robótica" required>
                     </div>
                     <div class="form-group">
-                        <label>Descripción</label>
+                        <label for="catDesc">Descripción</label>
                         <textarea id="catDesc" placeholder="Descripción de la categoría..." rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success">
-                        <span id="btnTextoCategoria">Crear Categoría</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="cancelarEdicionCategoria()"
-                        id="btnCancelarCategoria" style="display: none;">
-                        Cancelar
-                    </button>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> <span id="btnTextoCategoria">Crear Categoría</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelarEdicionCategoria()"
+                            id="btnCancelarCategoria" style="display: none;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
                 </form>
             </div>
 
             <div class="card">
-                <h2>Listado de Categorías</h2>
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-list"></i> Listado de Categorías
+                </h2>
                 <table>
                     <thead>
                         <tr>
@@ -146,10 +182,12 @@
         <!-- SECTION: PEDIDOS -->
         <section id="sec-pedidos" style="display: none;">
             <div class="card">
-                <h2>Todos los Pedidos</h2>
-                <div style="margin-bottom: 1rem;">
-                    <label>Filtrar por estado:</label>
-                    <select id="filtroEstado" onchange="cargarPedidosAdmin()">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-shopping-bag"></i> Todos los Pedidos
+                </h2>
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="filtroEstado" style="margin-right: 1rem; font-weight: 600;">Filtrar por estado:</label>
+                    <select id="filtroEstado" onchange="cargarPedidosAdmin()" style="min-width: 200px;">
                         <option value="">Todos</option>
                         <option value="PENDIENTE">Pendientes</option>
                         <option value="ENVIADO">Enviados</option>
@@ -158,14 +196,22 @@
                     </select>
                 </div>
                 <div id="listaPedidos">
-                    <p class="text-center">Cargando pedidos...</p>
+                    <p class="loading">Cargando pedidos...</p>
                 </div>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 HÁBILIS - Panel de Administración</p>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="fas fa-shapes"></i> HÁBILIS</h3>
+                <p>Panel de Administración</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 HÁBILIS Education S.L. - Admin Panel</p>
+        </div>
     </footer>
 
     <script src="js/admin.js"></script>
