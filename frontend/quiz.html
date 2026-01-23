@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubre el Kit Ideal - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-shapes"></i> HÁBILIS
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="catalog.html" class="nav-link">Catálogo</a>
+                <a href="quiz.html" class="nav-link active">Test de Habilidades</a>
+                <a href="login.html" class="btn btn-secondary">Entrar</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar-wrapper">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Datos del Niño</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Test de Habilidades</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Tu Kit Ideal</div>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Envío</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="quiz-container">
+
+        <!-- STEP 1: Datos del Niño -->
+        <section id="step1" class="quiz-step active">
+            <h1 class="quiz-title">Personaliza la aventura de tu hijo</h1>
+            <p class="quiz-subtitle">Ayúdanos a conocer mejor a tu pequeño explorador</p>
+
+            <div class="quiz-form">
+                <div class="form-group">
+                    <label for="childName">Nombre de pila del niño/a</label>
+                    <input type="text" id="childName" placeholder="Ej: Lucas" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="childAge">Edad (3-6 años)</label>
+                    <select id="childAge" required>
+                        <option value="">Selecciona la edad...</option>
+                        <option value="3">3 años (Exploradores)</option>
+                        <option value="4">4 años (Constructores)</option>
+                        <option value="5">5 años (Inventores)</option>
+                        <option value="6">6 años (Científicos)</option>
+                    </select>
+                </div>
+
+                <button onclick="goToStep(2)" class="btn btn-primary btn-large">
+                    Comenzar Test <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STEP 2: Test de Habilidades -->
+        <section id="step2" class="quiz-step">
+            <div class="quiz-progress">
+                <span id="questionNumber">Pregunta 1 de 5</span>
+            </div>
+
+            <h2 class="quiz-question" id="questionText"></h2>
+
+            <div class="quiz-options" id="optionsContainer"></div>
+        </section>
+
+        <!-- STEP 3: Resultado -->
+        <section id="step3" class="quiz-step">
+            <h1 class="quiz-title">¡Lo tenemos! 🎉</h1>
+            <p class="quiz-subtitle" id="resultSubtitle">El kit ideal para <span id="childNameResult"></span> es:</p>
+
+            <div class="result-card" id="resultCard">
+                <div class="loading">Cargando recomendación...</div>
+            </div>
+
+            <button onclick="goToStep(4)" class="btn btn-primary btn-large" id="btnContinueCheckout"
+                style="display: none;">
+                Personalizar y Pedir este Kit <i class="fas fa-arrow-right"></i>
+            </button>
+        </section>
+
+        <!-- STEP 4: Checkout -->
+        <section id="step4" class="quiz-step">
+            <h1 class="quiz-title">Resumen del Envío</h1>
+
+            <div class="checkout-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Producto:</span>
+                    <span class="summary-value" id="checkoutProduct">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Para:</span>
+                    <span class="summary-value" id="checkoutChild">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Plan:</span>
+                    <span class="summary-value">Suscripción Mensual</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row summary-total">
+                    <span class="summary-label">Total a pagar hoy:</span>
+                    <span class="summary-value" id="checkoutTotal">€0.00</span>
+                </div>
+            </div>
+
+            <div class="quiz-form" style="margin-top: 2rem;">
+                <div class="form-group">
+                    <label for="parentEmail">Tu correo electrónico (para el recibo)</label>
+                    <input type="email" id="parentEmail" placeholder="papa@email.com" required>
+                </div>
+
+                <button onclick="completeOrder()" class="btn btn-primary btn-large" id="btnCheckout">
+                    <i class="fas fa-lock"></i> Ir al Pago Seguro
+                </button>
+
+                <p style="text-align: center; color: var(--text-light); margin-top: 1rem; font-size: 0.9rem;">
+                    Garantía de devolución de 30 días. Cancelas cuando quieras.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="js/quiz.js"></script>
+</body>
+
+</html>

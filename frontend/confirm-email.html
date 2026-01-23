@@ -39,6 +39,27 @@
 
                 <div id="confirmError" class="alert alert-error" style="display: none;"></div>
 
+                <!-- Manual Token Input Form -->
+                <div id="manualTokenForm"
+                    style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                    <h4 style="margin-bottom: 1rem; color: var(--primary); font-size: 1.125rem;">
+                        💡 O ingresa el token manualmente
+                    </h4>
+                    <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9375rem;">
+                        Si prefieres, copia el token del email y pégalo aquí:
+                    </p>
+                    <div class="form-group">
+                        <label for="manualToken">Token de Confirmación</label>
+                        <input type="text" id="manualToken" placeholder="Ej: d8d26a57-dbb9-4d80-88cf-24fa7eaae944"
+                            style="font-family: monospace;">
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button onclick="confirmarManual()" class="btn btn-primary" id="btnConfirmarManual">
+                            <i class="fas fa-check-circle"></i> Confirmar Token
+                        </button>
+                    </div>
+                </div>
+
                 <div style="text-align: center; margin-top: 2rem;">
                     <p style="color: var(--text-light); margin-bottom: 1rem;">
                         ¿No recibiste el correo?
@@ -69,9 +90,11 @@
         if (token) {
             confirmarCuenta(token);
         } else {
+            // Si NO hay token, mostrar instrucciones de éxito (MENSAJE CORTO)
             document.getElementById('confirmMessage').innerHTML =
-                '<p style="color: var(--danger);">Token de confirmación no proporcionado en la URL.</p>';
-            document.getElementById('confirmMessage').className = 'alert alert-error';
+                '<p><strong>✅ Cuenta creada exitosamente!</strong></p>' +
+                '<p>Revisa tu email y haz clic en el enlace de confirmación.</p>';
+            document.getElementById('confirmMessage').className = 'alert alert-success';
         }
 
         async function confirmarCuenta(token) {
@@ -99,6 +122,29 @@
                 document.getElementById('confirmError').innerHTML = '<p>Error de conexión. Por favor, inténtalo de nuevo más tarde.</p>';
                 document.getElementById('confirmError').style.display = 'block';
             }
+        }
+
+        async function confirmarManual() {
+            const tokenInput = document.getElementById('manualToken');
+            const token = tokenInput.value.trim();
+
+            if (!token) {
+                alert('Por favor, ingresa el token de confirmación');
+                tokenInput.focus();
+                return;
+            }
+
+            // Deshabilitar botón mientras procesa
+            const btn = document.getElementById('btnConfirmarManual');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+            // Confirmar con el token ingresado
+            await confirmarCuenta(token);
+
+            // Rehabilitar botón
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar Token';
         }
 
         async function reenviarCorreo() {

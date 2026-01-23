@@ -106,6 +106,10 @@ function showSection(sectionName) {
     // Load section-specific data
     if (sectionName === 'orders') {
         loadOrders();
+    } else if (sectionName === 'profile') {
+        loadUserData(); // Recargar datos del perfil
+    } else if (sectionName === 'security') {
+        load2FAStatus(); // Recargar estado de 2FA
     }
 }
 
