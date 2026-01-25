@@ -15,7 +15,7 @@ const quizState = {
     currentQuestion: 0
 };
 
-// Questions (5 preguntas)
+// Questions (5 preguntas mejoradas - Basadas en Gardner/Piaget)
 const questions = [
     {
         id: 1,
@@ -31,41 +31,44 @@ const questions = [
     {
         id: 2,
         text: '¿qué hace {childName}?',
-        context: 'Al recibir un regalo cerrado',
+        context: 'Ante un regalo cerrado (caja nueva)',
         options: [
-            { letter: 'A', text: 'Pregunta cómo funciona antes de abrirlo', profile: 'Lógico' },
-            { letter: 'B', text: 'Rompe el papel rápidamente', profile: 'Motor' },
-            { letter: 'C', text: 'Mira los dibujos del papel con atención', profile: 'Artista' }
+            { letter: 'A', text: 'Pregunta "¿Qué es?" o intenta averiguar cómo abrirlo', profile: 'Lógico' },
+            { letter: 'B', text: 'Rompe el papel rápido y la agita', profile: 'Motor' },
+            { letter: 'C', text: 'Se fija en los dibujos y colores del papel', profile: 'Artista' }
         ]
     },
     {
         id: 3,
         text: '¿qué hace {childName}?',
-        context: 'Si un juguete se rompe',
+        context: 'Si se le rompe un juguete',
         options: [
-            { letter: 'A', text: 'Intenta arreglarlo o descubrir cómo funciona', profile: 'Lógico' },
-            { letter: 'B', text: 'Se frustra y lo lanza', profile: 'Motor' },
-            { letter: 'C', text: 'Inventa otro uso para él', profile: 'Artista' }
+            { letter: 'A', text: 'Intenta arreglarlo buscando dónde encaja la pieza', profile: 'Lógico' },
+            { letter: 'B', text: 'Te pide ayuda y te explica lo que pasó', profile: 'Explorador' },
+            { letter: 'C', text: 'Se frustra físicamente o lo tira', profile: 'Motor' },
+            { letter: 'D', text: 'Usa las piezas rotas para inventar otra cosa', profile: 'Artista' }
         ]
     },
     {
         id: 4,
-        text: '¿qué prefiere {childName}?',
+        text: '¿dónde pasa más tiempo {childName}?',
         context: 'En el parque',
         options: [
-            { letter: 'A', text: 'Observar cómo funcionan los mecanismos', profile: 'Lógico' },
-            { letter: 'B', text: 'Columpios, trepar, correr', profile: 'Motor' },
-            { letter: 'C', text: 'Juegos de roles o interacciones sociales', profile: 'Explorador' }
+            { letter: 'A', text: 'En el arenero buscando piedras o bichos', profile: 'Explorador' },
+            { letter: 'B', text: 'En los columpios, toboganes y trepando', profile: 'Motor' },
+            { letter: 'C', text: 'Jugando con otros a imaginar historias (roles)', profile: 'Artista' },
+            { letter: 'D', text: 'Observando cómo funciona el balancín', profile: 'Lógico' }
         ]
     },
     {
         id: 5,
-        text: '¿qué prefiere {childName}?',
+        text: '¿qué actividad prefiere {childName}?',
         context: 'Para actividades en casa',
         options: [
-            { letter: 'A', text: 'Puzzles, bloques de construcción', profile: 'Lógico' },
-            { letter: 'B', text: 'Bailar, saltar, actividades físicas', profile: 'Motor' },
-            { letter: 'C', text: 'Manualidades, pintar, tijeras', profile: 'Artista' }
+            { letter: 'A', text: 'Puzzles y bloques de construcción', profile: 'Lógico' },
+            { letter: 'B', text: 'Bailar o juegos de movimiento', profile: 'Motor' },
+            { letter: 'C', text: 'Manualidades, tijeras y pegamento', profile: 'Artista' },
+            { letter: 'D', text: 'Escuchar cuentos e historias', profile: 'Explorador' }
         ]
     }
 ];
@@ -182,22 +185,45 @@ function selectAnswer(profile) {
 function calculateProfile() {
     const profileCounts = {};
 
+    // Contar frecuencia de cada perfil
     quizState.answers.forEach(answer => {
         profileCounts[answer] = (profileCounts[answer] || 0) + 1;
     });
 
-    // Encontrar perfil ganador
+    // Encontrar el máximo de votos
     let maxCount = 0;
-    let winner = 'Lógico'; // Default
-
-    for (const [profile, count] of Object.entries(profileCounts)) {
+    for (const count of Object.values(profileCounts)) {
         if (count > maxCount) {
             maxCount = count;
-            winner = profile;
         }
     }
 
-    quizState.profile = winner;
+    // Obtener todos los perfiles con el máximo de votos
+    const winners = [];
+    for (const [profile, count] of Object.entries(profileCounts)) {
+        if (count === maxCount) {
+            winners.push(profile);
+        }
+    }
+
+    // Sistema de desempate: Lógico > Explorador > Artista > Motor
+    const priority = ['Lógico', 'Explorador', 'Artista', 'Motor'];
+
+    if (winners.length === 1) {
+        quizState.profile = winners[0];
+    } else {
+        // Empate: elegir según prioridad
+        for (const profile of priority) {
+            if (winners.includes(profile)) {
+                quizState.profile = profile;
+                break;
+            }
+        }
+    }
+
+    console.log('Respuestas:', quizState.answers);
+    console.log('Conteo de perfiles:', profileCounts);
+    console.log('Perfil ganador:', quizState.profile);
 }
 
 // ========================================
@@ -213,6 +239,8 @@ async function showResult() {
     try {
         // CRÍTICO: Fetch del producto desde backend
         const kitId = kitMapping[quizState.profile] || 1;
+        console.log('Buscando producto ID:', kitId, 'para perfil:', quizState.profile);
+
         const response = await fetch(`${API_BASE_URL}/productos/${kitId}`);
 
         if (!response.ok) {
@@ -222,22 +250,51 @@ async function showResult() {
         const kit = await response.json();
         quizState.selectedKit = kit;
 
-        // Mostrar resultado
+        console.log('Producto encontrado:', kit);
+
+        // Descripciones pedagógicas por perfil
         const profileDescriptions = {
-            'Lógico': `Hemos detectado que ${quizState.childName} disfruta construyendo y entendiendo cómo funcionan las cosas. Este kit potenciará su lógica y creatividad.`,
-            'Artista': `Hemos detectado que ${quizState.childName} tiene una gran creatividad artística. Este kit desarrollará su expresión y habilidades manuales.`,
-            'Motor': `Hemos detectado que ${quizState.childName} aprende mejor a través del movimiento. Este kit canalizará su energía de forma educativa.`,
-            'Explorador': `Hemos detectado que ${quizState.childName} es un explorador natural. Este kit alimentará su curiosidad por el mundo.`
+            'Lógico': `🧮 <strong>Inteligencia Lógico-Matemática</strong><br>Hemos detectado que ${quizState.childName} disfruta construyendo, clasificando y entendiendo cómo funcionan las cosas. Este kit potenciará su razonamiento lógico y pensamiento matemático.`,
+            'Artista': `🎨 <strong>Inteligencia Visual-Espacial</strong><br>Hemos detectado que ${quizState.childName} tiene una gran creatividad artística y sensibilidad visual. Este kit desarrollará su expresión creativa y habilidades manuales.`,
+            'Motor': `🤸 <strong>Inteligencia Cinestésico-Corporal</strong><br>Hemos detectado que ${quizState.childName} aprende mejor a través del movimiento y la acción. Este kit canalizará su energía de forma educativa y estructurada.`,
+            'Explorador': `🌿 <strong>Inteligencia Naturalista</strong><br>Hemos detectado que ${quizState.childName} es un explorador natural con gran curiosidad por el entorno. Este kit alimentará su amor por la naturaleza y el descubrimiento.`
         };
 
+        // Renderizar resultado con imagen
         resultCard.innerHTML = `
-            <div class="kit-image">${kit.imagenUrl || '📦'}</div>
-            <div class="kit-info">
-                <h3 class="kit-name">${kit.nombre}</h3>
-                <p class="kit-description">${profileDescriptions[quizState.profile]}</p>
-                <div class="kit-badge">
-                    <i class="fas fa-check-circle"></i> Potencia: ${quizState.profile}${quizState.profile === 'Lógico' ? '-Matemática' : ''}
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            border-radius: var(--radius); 
+                            padding: 3rem 2rem; 
+                            color: white;
+                            font-size: 4rem;">
+                    ${quizState.profile === 'Lógico' ? '🧮' : quizState.profile === 'Artista' ? '🎨' : quizState.profile === 'Motor' ? '🤸' : '🌿'}
                 </div>
+            </div>
+            <div class="kit-info" style="text-align: center;">
+                <h3 class="kit-name" style="font-size: 1.75rem; color: var(--primary); margin-bottom: 1rem;">
+                    ${kit.nombre}
+                </h3>
+                <p class="kit-description" style="color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.8;">
+                    ${profileDescriptions[quizState.profile]}
+                </p>
+                <div style="background: var(--bg-light); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1.5rem;">
+                    <p style="color: var(--text-dark); margin-bottom: 0.5rem;">
+                        <strong>📦 Contenido del Mes 1:</strong>
+                    </p>
+                    <p style="color: var(--text-light); font-size: 0.95rem;">
+                        ${kit.descripcion}
+                    </p>
+                </div>
+                <div class="kit-badge" style="display: inline-block; background: var(--accent); color: white; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 600; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> Perfil: ${quizState.profile}${quizState.profile === 'Lógico' ? '-Matemático' : quizState.profile === 'Artista' ? ' Creativo' : quizState.profile === 'Motor' ? ' Activo' : ' Naturalista'}
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--secondary); margin-top: 1rem;">
+                    ${kit.precio.toFixed(2)}€ <span style="font-size: 1rem; font-weight: 400; color: var(--text-light);">/mes</span>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.5rem;">
+                    🔒 Cancela cuando quieras • 📦 Envío gratis • ✨ 30 días de garantía
+                </p>
             </div>
         `;
 
@@ -297,41 +354,60 @@ async function completeOrder() {
 
         let userId;
         if (userResponse.ok) {
+            // Usuario logueado - proceder con checkout
             const userData = await userResponse.json();
             userId = userData.id;
+
+            // CRÍTICO: Crear pedido en backend
+            const orderData = {
+                usuarioId: userId,
+                items: [{
+                    productoId: quizState.selectedKit.id,
+                    cantidad: 1
+                }]
+            };
+
+            const response = await fetch(`${API_BASE_URL}/pedidos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(orderData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Pedido creado exitosamente
+                alert(`¡Pedido creado exitosamente! 🎉\n\nNúmero de pedido: #${data.pedidoId || 'XXXX'}\nTotal: €${quizState.selectedKit.precio.toFixed(2)}\n\nRecibirás un email de confirmación en: ${email}`);
+
+                // Redirigir a dashboard
+                window.location.href = 'user-dashboard.html';
+            } else {
+                throw new Error(data.message || 'Error al crear pedido');
+            }
+
         } else {
-            // Usuario no logueado - podría crear cuenta automática o mostrar error
-            alert('Debes iniciar sesión para completar la compra. Redirigiendo...');
-            window.location.href = `login.html?redirect=quiz.html`;
+            // Usuario NO logueado - guardar datos del quiz y redirigir a registro
+            const quizData = {
+                childName: quizState.childName,
+                childAge: quizState.childAge,
+                profile: quizState.profile,
+                productId: quizState.selectedKit.id,
+                productName: quizState.selectedKit.nombre,
+                productPrice: quizState.selectedKit.precio,
+                email: email,
+                timestamp: new Date().toISOString()
+            };
+
+            // Guardar en sessionStorage para recuperar después del registro
+            sessionStorage.setItem('pendingQuizCheckout', JSON.stringify(quizData));
+
+            // Mostrar mensaje y redirigir a registro
+            alert('¡Genial! Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro. Tus datos del quiz están guardados. 😊');
+
+            // Redirigir a registro con parámetro para indicar que viene del quiz
+            window.location.href = `register.html?from=quiz&product=${quizState.selectedKit.id}`;
             return;
-        }
-
-        // CRÍTICO: Crear pedido en backend
-        const orderData = {
-            usuarioId: userId,
-            items: [{
-                productoId: quizState.selectedKit.id,
-                cantidad: 1
-            }]
-        };
-
-        const response = await fetch(`${API_BASE_URL}/pedidos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(orderData)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            // Pedido creado exitosamente
-            alert(`¡Pedido creado exitosamente! 🎉\n\nNúmero de pedido: #${data.pedidoId || 'XXXX'}\nTotal: €${quizState.selectedKit.precio.toFixed(2)}\n\nRecibirás un email de confirmación en: ${email}`);
-
-            // Redirigir a dashboard
-            window.location.href = 'user-dashboard.html';
-        } else {
-            throw new Error(data.message || 'Error al crear pedido');
         }
 
     } catch (error) {

@@ -24,81 +24,88 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    /**
-     * Configuración principal de seguridad
-     * Define qué rutas son públicas y cuáles requieren autenticación
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // Deshabilitar CSRF temporalmente (se habilitará después con tokens)
-                .csrf(csrf -> csrf.disable())
+        /**
+         * Configuración principal de seguridad
+         * Define qué rutas son públicas y cuáles requieren autenticación
+         */
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                // Deshabilitar CSRF temporalmente (se habilitará después con tokens)
+                                .csrf(csrf -> csrf.disable())
 
-                // Configurar CORS
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                // Configurar CORS
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Configurar autorización de requests
-                .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas (sin autenticación)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/health", "/api/welcome").permitAll()
-                        .requestMatchers("/api/test/**").permitAll()
+                                // Configurar autorización de requests
+                                .authorizeHttpRequests(auth -> auth
+                                                // Rutas públicas (sin autenticación)
+                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/health", "/api/welcome").permitAll()
+                                                .requestMatchers("/api/test/**").permitAll()
 
-                        // Rutas que requieren autenticación
-                        .anyRequest().authenticated())
+                                                // Productos y Categorías - GET público (para catálogo y quiz)
+                                                .requestMatchers("GET", "/api/productos", "/api/productos/**")
+                                                .permitAll()
+                                                .requestMatchers("GET", "/api/categorias", "/api/categorias/**")
+                                                .permitAll()
 
-                // Configurar manejo de sesiones HTTP
-                .sessionManagement(session -> session
-                        .maximumSessions(1) // Máximo una sesión por usuario
-                        .maxSessionsPreventsLogin(false) // Permitir nueva sesión (invalida la anterior)
-                )
+                                                // Rutas que requieren autenticación
+                                                .anyRequest().authenticated())
 
-                // Deshabilitar el formulario de login por defecto
-                .formLogin(form -> form.disable())
+                                // Configurar manejo de sesiones HTTP
+                                .sessionManagement(session -> session
+                                                .maximumSessions(1) // Máximo una sesión por usuario
+                                                .maxSessionsPreventsLogin(false) // Permitir nueva sesión (invalida la
+                                                                                 // anterior)
+                                )
 
-                // Deshabilitar HTTP Basic Auth
-                .httpBasic(basic -> basic.disable());
+                                // Deshabilitar el formulario de login por defecto
+                                .formLogin(form -> form.disable())
 
-        return http.build();
-    }
+                                // Deshabilitar HTTP Basic Auth
+                                .httpBasic(basic -> basic.disable());
 
-    /**
-     * Bean para encriptar contraseñas con BCrypt
-     * Fuerza de encriptación: 10 rondas (por defecto)
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                return http.build();
+        }
 
-    /**
-     * Configuración de CORS
-     * Permite peticiones desde el frontend (http://localhost)
-     */
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        /**
+         * Bean para encriptar contraseñas con BCrypt
+         * Fuerza de encriptación: 10 rondas (por defecto)
+         */
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-        // Orígenes permitidos
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost",
-                "http://localhost:80",
-                "http://127.0.0.1"));
+        /**
+         * Configuración de CORS
+         * Permite peticiones desde el frontend (http://localhost)
+         */
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        // Métodos HTTP permitidos
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                // Orígenes permitidos
+                configuration.setAllowedOrigins(List.of(
+                                "http://localhost",
+                                "http://localhost:80",
+                                "http://127.0.0.1"));
 
-        // Headers permitidos
-        configuration.setAllowedHeaders(List.of("*"));
+                // Métodos HTTP permitidos
+                configuration.setAllowedMethods(Arrays.asList(
+                                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
-        // Permitir credenciales (cookies, sesiones HTTP)
-        configuration.setAllowCredentials(true);
+                // Headers permitidos
+                configuration.setAllowedHeaders(List.of("*"));
 
-        // Aplicar configuración a todas las rutas
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+                // Permitir credenciales (cookies, sesiones HTTP)
+                configuration.setAllowCredentials(true);
 
-        return source;
-    }
+                // Aplicar configuración a todas las rutas
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+
+                return source;
+        }
 }

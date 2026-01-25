@@ -1,5 +1,6 @@
 package com.habilis.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -20,7 +21,7 @@ public class Producto {
     private Long id;
 
     @NotNull(message = "La categoría es obligatoria")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
@@ -48,14 +49,15 @@ public class Producto {
 
     // Relación con DetallePedido
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<DetallePedido> detallesPedido = new ArrayList<>();
 
     // Constructores
     public Producto() {
     }
 
-    public Producto(Categoria categoria, String nombre, String descripcion, 
-                    BigDecimal precio, Integer stock, String imagenUrl) {
+    public Producto(Categoria categoria, String nombre, String descripcion,
+            BigDecimal precio, Integer stock, String imagenUrl) {
         this.categoria = categoria;
         this.nombre = nombre;
         this.descripcion = descripcion;
