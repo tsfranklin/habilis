@@ -358,6 +358,8 @@ async function completeOrder() {
             const userData = await userResponse.json();
             userId = userData.id;
 
+            console.log('Usuario logueado:', userId);
+
             // CRÍTICO: Crear pedido en backend
             const orderData = {
                 usuarioId: userId,
@@ -367,6 +369,8 @@ async function completeOrder() {
                 }]
             };
 
+            console.log('Enviando pedido:', orderData);
+
             const response = await fetch(`${API_BASE_URL}/pedidos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -374,11 +378,24 @@ async function completeOrder() {
                 body: JSON.stringify(orderData)
             });
 
-            const data = await response.json();
+            console.log('Response status:', response.status);
 
-            if (data.success) {
+            // Verificar si la respuesta es exitosa (status 2xx)
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || errorData.message || 'Error en el servidor');
+            }
+
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+
+            // El backend retorna {success: true, message: "...", pedido: {...}}
+            if (data.success && data.pedido) {
                 // Pedido creado exitosamente
-                alert(`¡Pedido creado exitosamente! 🎉\n\nNúmero de pedido: #${data.pedidoId || 'XXXX'}\nTotal: €${quizState.selectedKit.precio.toFixed(2)}\n\nRecibirás un email de confirmación en: ${email}`);
+                alert(`¡Pedido creado exitosamente! 🎉\n\nNúmero de pedido: #${data.pedido.id}\nTotal: €${quizState.selectedKit.precio.toFixed(2)}\n\nRecibirás un email de confirmación en: ${email}`);
+
+                // Limpiar sessionStorage si existe
+                sessionStorage.removeItem('pendingQuizCheckout');
 
                 // Redirigir a dashboard
                 window.location.href = 'user-dashboard.html';
@@ -388,6 +405,8 @@ async function completeOrder() {
 
         } else {
             // Usuario NO logueado - guardar datos del quiz y redirigir a registro
+            console.log('Usuario no logueado, guardando datos del quiz...');
+
             const quizData = {
                 childName: quizState.childName,
                 childAge: quizState.childAge,
@@ -401,6 +420,7 @@ async function completeOrder() {
 
             // Guardar en sessionStorage para recuperar después del registro
             sessionStorage.setItem('pendingQuizCheckout', JSON.stringify(quizData));
+            console.log('Datos guardados en sessionStorage:', quizData);
 
             // Mostrar mensaje y redirigir a registro
             alert('¡Genial! Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro. Tus datos del quiz están guardados. 😊');
@@ -412,7 +432,8 @@ async function completeOrder() {
 
     } catch (error) {
         console.error('Error al completar pedido:', error);
-        alert('Error al procesar el pedido. Por favor, inténtalo de nuevo.');
+        console.error('Error detallado:', error.message);
+        alert(`Error al procesar el pedido:\n\n${error.message}\n\nPor favor, inténtalo de nuevo.`);
         btnCheckout.disabled = false;
         btnCheckout.innerHTML = '<i class="fas fa-lock"></i> Ir al Pago Seguro';
     }
@@ -424,5 +445,47 @@ async function completeOrder() {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Quiz Funnel Loaded');
-    updateProgressBar(1);
+
+    // Check if user is returning from registration to complete checkout
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeCheckout = urlParams.get('resumeCheckout');
+
+    if (resumeCheckout === 'true') {
+        const savedQuiz = sessionStorage.getItem('pendingQuizCheckout');
+        if (savedQuiz) {
+            console.log('Restaurando datos del quiz...');
+            const quizData = JSON.parse(savedQuiz);
+
+            // Restore quiz state
+            quizState.childName = quizData.childName;
+            quizState.childAge = quizData.childAge;
+            quizState.profile = quizData.profile;
+            quizState.selectedKit = {
+                id: quizData.productId,
+                nombre: quizData.productName,
+                precio: quizData.productPrice
+            };
+
+            // Pre-fill email
+            const emailInput = document.getElementById('parentEmail');
+            if (emailInput && quizData.email) {
+                emailInput.value = quizData.email;
+            }
+
+            // Navigate directly to step 4 (checkout)
+            console.log('Mostrando paso 4 (checkout)');
+            goToStep(4);
+            showCheckoutSummary();
+
+            // Show message to user
+            setTimeout(() => {
+                alert('👋 ¡Bienvenido!\n\nAhora puedes completar tu pedido.');
+            }, 500);
+        } else {
+            console.warn('No se encontraron datos del quiz en sessionStorage');
+            updateProgressBar(1);
+        }
+    } else {
+        updateProgressBar(1);
+    }
 });

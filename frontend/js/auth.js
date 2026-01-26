@@ -75,11 +75,23 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
                 document.getElementById('twoFactorUserId').value = data.userId;
                 showMessage('loginSuccess', 'Ingresa tu código de autenticación', 'success');
             } else {
-                // Login successful, redirect to dashboard
+                // Login successful
                 showMessage('loginSuccess', 'Inicio de sesión exitoso', 'success');
-                setTimeout(() => {
-                    window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
-                }, 1000);
+
+                // Check if user came from quiz checkout
+                const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
+                if (pendingQuiz) {
+                    console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
+                    setTimeout(() => {
+                        // Redirect back to quiz to complete checkout
+                        window.location.href = 'quiz.html?resumeCheckout=true';
+                    }, 1000);
+                } else {
+                    // Normal redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                    }, 1000);
+                }
             }
         } else {
             showMessage('loginError', data.message || 'Error al iniciar sesión');
@@ -105,6 +117,8 @@ document.getElementById('twoFactorForm')?.addEventListener('submit', async (e) =
     const userId = document.getElementById('twoFactorUserId').value;
     const code = document.getElementById('twoFactorCode').value;
 
+    console.log('Verificando 2FA para usuario:', userId, 'código:', code);
+
     showLoader(submitBtn);
 
     try {
@@ -117,9 +131,20 @@ document.getElementById('twoFactorForm')?.addEventListener('submit', async (e) =
 
         if (data.success) {
             showMessage('loginSuccess', 'Verificación exitosa', 'success');
-            setTimeout(() => {
-                window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
-            }, 1000);
+
+            // Check if user came from quiz checkout
+            const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
+            if (pendingQuiz) {
+                console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
+                setTimeout(() => {
+                    window.location.href = 'quiz.html?resumeCheckout=true';
+                }, 1000);
+            } else {
+                // Normal redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
+                }, 1000);
+            }
         } else {
             showMessage('twoFactorError', data.message || 'Código incorrecto');
         }

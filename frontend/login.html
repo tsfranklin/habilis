@@ -58,6 +58,9 @@
                 <p style="color: var(--text-light); margin-bottom: 1.5rem;">Ingresa el código de 6 dígitos de tu
                     aplicación de autenticación</p>
 
+                <!-- Hidden field to store user ID during 2FA -->
+                <input type="hidden" id="twoFactorUserId" name="userId" value="">
+
                 <div class="form-group">
                     <label for="twoFactorCode">Código 2FA</label>
                     <input type="text" id="twoFactorCode" name="code" placeholder="123456" maxlength="6"
