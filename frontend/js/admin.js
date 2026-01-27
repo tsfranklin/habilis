@@ -469,9 +469,16 @@ async function logout() {
             method: 'POST',
             credentials: 'include'
         });
+
+        // Clear all session storage
+        sessionStorage.clear();
+        console.log('Session data cleared on logout');
+
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout error:', error);
+        // Even if logout fails on server, clear local data
+        sessionStorage.clear();
         window.location.href = 'login.html';
     }
 }

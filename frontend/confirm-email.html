@@ -109,8 +109,19 @@
                     document.getElementById('confirmMessage').style.display = 'none';
                     document.getElementById('confirmSuccess').style.display = 'block';
 
+                    // Check if user came from quiz
+                    const fromQuiz = urlParams.get('from');
+                    const email = urlParams.get('email');
+
                     setTimeout(() => {
-                        window.location.href = 'login.html';
+                        if (fromQuiz === 'quiz' && email) {
+                            // Redirect to login with quiz parameters to continue checkout
+                            console.log('Usuario confirmó desde quiz, redirigiendo al login...');
+                            window.location.href = `login.html?from=quiz&email=${encodeURIComponent(email)}`;
+                        } else {
+                            // Normal confirmation - redirect to login page
+                            window.location.href = 'login.html';
+                        }
                     }, 3000);
                 } else {
                     document.getElementById('confirmMessage').style.display = 'none';

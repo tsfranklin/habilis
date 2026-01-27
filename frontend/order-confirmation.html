@@ -289,7 +289,8 @@
         // Descargar factura
         document.getElementById('downloadInvoice').addEventListener('click', async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/facturas/${invoiceCode}/descargar`, {
+                // Use the correct endpoint for downloading invoice
+                const response = await fetch(`http://localhost:8080/api/pedidos/${orderId}/factura`, {
                     credentials: 'include'
                 });
 
@@ -298,7 +299,7 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `factura_${invoiceCode}.pdf`;
+                    a.download = `factura_pedido_${orderId}.pdf`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);

@@ -337,89 +337,54 @@ function showCheckoutSummary() {
 }
 
 async function completeOrder() {
-    const email = document.getElementById('parentEmail').value.trim();
-
-    if (!email) {
-        alert('Por favor, ingresa tu correo electrónico');
-        return;
-    }
-
     const btnCheckout = document.getElementById('btnCheckout');
     btnCheckout.disabled = true;
     btnCheckout.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
 
     try {
-        // Verificar sesión
+        // PRIMERO: Verificar si el usuario ya está logueado
         const userResponse = await fetch(`${API_BASE_URL}/auth/me`, { credentials: 'include' });
 
-        let userId;
         if (userResponse.ok) {
-            // Usuario logueado - proceder con checkout
+            // Usuario YA está logueado - usar su sesión activa
             const userData = await userResponse.json();
-            userId = userData.id;
+            console.log('Usuario YA logueado detectado:', userData.correoElectronico);
 
-            console.log('Usuario logueado:', userId);
-
-            // CRÍTICO: Crear pedido en backend
-            const orderData = {
-                usuarioId: userId,
-                items: [{
-                    productoId: quizState.selectedKit.id,
-                    cantidad: 1
-                }]
+            // Guardar datos para payment.html
+            const paymentData = {
+                userId: userData.id,
+                userEmail: userData.correoElectronico,
+                productId: quizState.selectedKit.id,
+                productName: quizState.selectedKit.nombre,
+                productPrice: quizState.selectedKit.precio,
+                childName: quizState.childName,
+                childAge: quizState.childAge,
+                profile: quizState.profile,
+                timestamp: new Date().toISOString()
             };
 
-            console.log('Enviando pedido:', orderData);
+            sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
+            console.log('Datos guardados para pago (usuario logueado):', paymentData);
 
-            const response = await fetch(`${API_BASE_URL}/pedidos`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(orderData)
-            });
+            // Limpiar pendingQuizCheckout si existe
+            sessionStorage.removeItem('pendingQuizCheckout');
 
-            console.log('Response status:', response.status);
-
-            // Verificar si la respuesta es exitosa (status 2xx)
-            if (!response.ok) {
-                // Intentar parsear el error si hay contenido JSON
-                let errorMessage = 'Error en el servidor';
-                const contentType = response.headers.get('content-type');
-
-                if (contentType && contentType.includes('application/json')) {
-                    try {
-                        const errorData = await response.json();
-                        errorMessage = errorData.error || errorData.message || errorMessage;
-                    } catch (e) {
-                        console.error('Error parseando JSON de error:', e);
-                        errorMessage = `Error ${response.status}: ${response.statusText}`;
-                    }
-                } else {
-                    errorMessage = `Error ${response.status}: ${response.statusText}`;
-                }
-
-                throw new Error(errorMessage);
-            }
-
-            const data = await response.json();
-            console.log('Respuesta del servidor:', data);
-
-            // El backend retorna {success: true, message: "...", pedido: {...}, codigoFactura: "..."}
-            if (data.success && data.pedido && data.codigoFactura) {
-                // Pedido creado exitosamente
-                console.log('Pedido creado:', data.pedido.id);
-                console.log('Código de factura:', data.codigoFactura);
-
-                // Limpiar sessionStorage si existe
-                sessionStorage.removeItem('pendingQuizCheckout');
-
-                // Redirigir a página de confirmación con parámetros
-                window.location.href = `order-confirmation.html?orderId=${data.pedido.id}&invoiceCode=${data.codigoFactura}`;
-            } else {
-                throw new Error(data.message || 'Error al crear pedido');
-            }
+            // Redirigir a la página de pago
+            window.location.href = 'payment.html';
+            return;
 
         } else {
+            // Usuario NO está logueado - necesita ingresar email
+            const email = document.getElementById('parentEmail').value.trim();
+
+
+            if (!email) {
+                alert('Por favor, ingresa tu correo electrónico');
+                btnCheckout.disabled = false;
+                btnCheckout.innerHTML = '<i class="fas fa-credit-card"></i> Ir al Pago Seguro';
+                return;
+            }
+
             // Usuario NO logueado - verificar si el email existe en BD
             console.log('Usuario no logueado, verificando si el email existe...');
 
@@ -434,16 +399,42 @@ async function completeOrder() {
                 timestamp: new Date().toISOString()
             };
 
-            // Guardar en sessionStorage para recuperar después del registro
+            // Guardar en sessionStorage para recuperar después del registro/login
             sessionStorage.setItem('pendingQuizCheckout', JSON.stringify(quizData));
             console.log('Datos guardados en sessionStorage:', quizData);
 
-            // Mostrar mensaje y redirigir a registro
-            alert('¡Genial! Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro. Tus datos del quiz están guardados. 😊');
+            // Verificar si el email ya existe en la BD
+            try {
+                const checkEmailResponse = await fetch(`${API_BASE_URL}/auth/check-email?email=${encodeURIComponent(email)}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
 
-            // Redirigir a registro con parámetro para indicar que viene del quiz
-            window.location.href = `register.html?from=quiz&product=${quizState.selectedKit.id}`;
-            return;
+                if (!checkEmailResponse.ok) {
+                    throw new Error('Error al verificar email');
+                }
+
+                const checkData = await checkEmailResponse.json();
+                console.log('Verificación de email:', checkData);
+
+                if (checkData.exists) {
+                    // El email YA EXISTE → Redirigir a LOGIN
+                    alert('¡Ya tienes una cuenta con este email! 🎉\n\nTe redirigiremos al login para completar tu pedido.');
+                    window.location.href = `login.html?from=quiz&email=${encodeURIComponent(email)}`;
+                } else {
+                    // El email NO existe → Redirigir a REGISTRO
+                    alert('¡Genial! Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro. Tus datos del quiz están guardados. 😊');
+                    window.location.href = `register.html?from=quiz&email=${encodeURIComponent(email)}&product=${quizState.selectedKit.id}`;
+                }
+                return;
+
+            } catch (emailCheckError) {
+                console.error('Error al verificar email:', emailCheckError);
+                // Si falla la verificación, redirigir a registro por defecto
+                alert('Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro.');
+                window.location.href = `register.html?from=quiz&product=${quizState.selectedKit.id}`;
+                return;
+            }
         }
 
     } catch (error) {

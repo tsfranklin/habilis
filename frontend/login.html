@@ -97,6 +97,21 @@
         </div>
     </div>
 
+    <script>
+        // Prefill email if coming from quiz
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+
+            if (email) {
+                const emailInput = document.getElementById('loginEmail');
+                if (emailInput) {
+                    emailInput.value = decodeURIComponent(email);
+                    console.log('Email pre-filled from quiz:', email);
+                }
+            }
+        });
+    </script>
     <script src="js/auth.js"></script>
 </body>
 

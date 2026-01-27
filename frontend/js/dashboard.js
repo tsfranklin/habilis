@@ -345,10 +345,17 @@ async function logout() {
             credentials: 'include'
         });
 
+        // Clear all session and local storage to prevent data leaks between users
+        sessionStorage.clear();
         localStorage.removeItem('currentUser');
+        console.log('Session data cleared on logout');
+
         window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout error:', error);
+        // Even if logout fails on server, clear local data and redirect
+        sessionStorage.clear();
+        localStorage.removeItem('currentUser');
         window.location.href = 'login.html';
     }
 }

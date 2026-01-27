@@ -131,14 +131,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body(
                     Map.of("error", "Error al verificar email"));
         }
-    }session.setAttribute("userId",usuario.getId());session.setAttribute("userEmail",usuario.getCorreoElectronico());session.setAttribute("userRole",usuario.getTipoUsuario());
-
-    return ResponseEntity.ok(new AuthResponse(true,"Login exitoso",usuario.getId(),usuario.getTipoUsuario()));}}catch(
-
-    RuntimeException e)
-    {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(false, e.getMessage()));
-    }
     }
 
     /**

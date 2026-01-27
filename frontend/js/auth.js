@@ -80,13 +80,21 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 
                 // Check if user came from quiz checkout
                 const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
-                if (pendingQuiz) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const fromQuiz = urlParams.get('from') === 'quiz';
+
+                if (pendingQuiz && fromQuiz) {
+                    // User came from quiz - keep the quiz data and redirect back
                     console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
                     setTimeout(() => {
                         // Redirect back to quiz to complete checkout
                         window.location.href = 'quiz.html?resumeCheckout=true';
                     }, 1000);
                 } else {
+                    // Normal login - clear any old quiz data from previous sessions
+                    sessionStorage.removeItem('pendingQuizCheckout');
+                    console.log('Login normal - quiz data anterior eliminada');
+
                     // Normal redirect to dashboard
                     setTimeout(() => {
                         window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
@@ -134,12 +142,20 @@ document.getElementById('twoFactorForm')?.addEventListener('submit', async (e) =
 
             // Check if user came from quiz checkout
             const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
-            if (pendingQuiz) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromQuiz = urlParams.get('from') === 'quiz';
+
+            if (pendingQuiz && fromQuiz) {
+                // User came from quiz - keep the quiz data and redirect back
                 console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
                 setTimeout(() => {
                     window.location.href = 'quiz.html?resumeCheckout=true';
                 }, 1000);
             } else {
+                // Normal login - clear any old quiz data from previous sessions
+                sessionStorage.removeItem('pendingQuizCheckout');
+                console.log('2FA verificado - quiz data anterior eliminada');
+
                 // Normal redirect to dashboard
                 setTimeout(() => {
                     window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
@@ -209,9 +225,19 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
             );
             form.reset();
 
-            // Redirect to confirmation page after 3 seconds
+            // Always redirect to confirmation page (requirement from tutor)
+            // If user came from quiz, the confirm-email page will handle the redirect back
             setTimeout(() => {
-                window.location.href = 'confirm-email.html';
+                // Pass quiz parameters to confirmation page
+                const urlParams = new URLSearchParams(window.location.search);
+                const fromQuiz = urlParams.get('from');
+                const email = urlParams.get('email');
+
+                if (fromQuiz === 'quiz' && email) {
+                    window.location.href = `confirm-email.html?from=quiz&email=${encodeURIComponent(email)}`;
+                } else {
+                    window.location.href = 'confirm-email.html';
+                }
             }, 3000);
         } else {
             showMessage('registerError', data.message || 'Error al registrar usuario');

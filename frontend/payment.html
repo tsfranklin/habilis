@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Seguro - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box" style="max-width: 600px;">
+            <!-- Header -->
+            <div class="auth-header">
+                <a href="index.html" class="auth-logo">
+                    <i class="fas fa-shapes"></i> HÁBILIS
+                </a>
+                <p class="auth-subtitle">Pago Seguro</p>
+            </div>
+
+            <!-- Order Summary -->
+            <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--primary);">
+                    <i class="fas fa-shopping-bag"></i> Resumen de tu Pedido
+                </h3>
+
+                <div id="orderSummary" style="color: var(--text-secondary);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span><strong>Producto:</strong></span>
+                        <span id="summaryProduct">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span><strong>Para:</strong></span>
+                        <span id="summaryChild">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span><strong>Perfil:</strong></span>
+                        <span id="summaryProfile">-</span>
+                    </div>
+                    <hr style="margin: 1rem 0; border-color: var(--border);">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.25rem;">
+                        <span><strong>Total:</strong></span>
+                        <span id="summaryTotal" style="color: var(--primary); font-weight: bold;">€0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <form id="paymentForm" class="auth-form">
+                <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-credit-card"></i> Método de Pago
+                </h2>
+
+                <p
+                    style="background: #fff3cd; color: #856404; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Esto es una simulación. La información de la tarjeta no será
+                    procesada realmente.
+                </p>
+
+                <div class="form-group">
+                    <label for="cardNumber">Número de Tarjeta</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                    <p class="form-help">Ingresa 16 dígitos sin espacios</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="cardExpiry">Fecha de Vencimiento</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cardCVV">CVV</label>
+                        <input type="text" id="cardCVV" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardName">Nombre del Titular</label>
+                    <input type="text" id="cardName" placeholder="Como aparece en la tarjeta" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <span class="btn-text">
+                        <i class="fas fa-lock"></i> Confirmar Pago Seguro
+                    </span>
+                    <span class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Procesando...
+                    </span>
+                </button>
+
+                <div id="paymentError" class="alert alert-error" style="display: none; margin-top: 1rem;"></div>
+                <div id="paymentSuccess" class="alert alert-success" style="display: none; margin-top: 1rem;"></div>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+                <i class="fas fa-shield-alt"></i> Tu información está protegida con encriptación SSL
+            </div>
+        </div>
+    </div>
+
+    <script src="js/payment.js"></script>
+</body>
+
+</html>

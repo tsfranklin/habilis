@@ -62,11 +62,19 @@ async function logout() {
             credentials: 'include'
         });
 
+        // Clear all session and local storage
+        sessionStorage.clear();
         localStorage.removeItem('currentUser');
         localStorage.removeItem('userRole');
+        console.log('Session data cleared on logout');
+
         window.location.reload();
     } catch (error) {
         console.error('Error al cerrar sesión:', error);
+        // Even if logout fails on server, clear local data
+        sessionStorage.clear();
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('userRole');
         window.location.reload();
     }
 }
