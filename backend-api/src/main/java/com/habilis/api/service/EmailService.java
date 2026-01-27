@@ -1,8 +1,14 @@
 package com.habilis.api.service;
 
+import com.habilis.api.entity.Factura;
+import com.habilis.api.entity.Pedido;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -107,6 +113,97 @@ public class EmailService {
                 nombreCompleto);
 
         enviarEmail(destinatario, asunto, mensaje);
+    }
+
+    /**
+     * Enviar email de confirmación de pedido con factura PDF adjunta
+     * 
+     * @param destinatario Email del usuario
+     * @param pedido       Pedido creado
+     * @param factura      Factura generada
+     * @param pdfFactura   Bytes del PDF de la factura
+     */
+    public void enviarConfirmacionPedido(String destinatario, Pedido pedido, Factura factura, byte[] pdfFactura) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(destinatario);
+            helper.setSubject("✅ Confirmación de Pedido #" + pedido.getId() + " - HÁBILIS");
+
+            // Generar contenido HTML del email
+            String htmlContent = generarHtmlConfirmacionPedido(pedido, factura);
+            helper.setText(htmlContent, true);
+
+            // Adjuntar PDF de la factura
+            helper.addAttachment("factura_" + factura.getCodigoFactura() + ".pdf",
+                    new ByteArrayResource(pdfFactura));
+
+            mailSender.send(message);
+
+            System.out.println("✅ Email de confirmación enviado a: " + destinatario);
+        } catch (MessagingException e) {
+            System.err.println("❌ Error al enviar email de confirmación a " + destinatario + ": " + e.getMessage());
+            // No lanzar excepción para no bloquear la creación del pedido
+        }
+    }
+
+    /**
+     * Generar HTML para email de confirmación de pedido
+     */
+    private String generarHtmlConfirmacionPedido(Pedido pedido, Factura factura) {
+        return """
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #FF6B35; color: white; padding: 20px; text-align: center; }
+                        .content { background-color: #f9f9f9; padding: 20px; margin-top: 20px; }
+                        .order-details { background-color: white; padding: 15px; margin: 15px 0; border-left: 4px solid #FF6B35; }
+                        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }
+                        .button { background-color: #FF6B35; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🎉 ¡Pedido Confirmado!</h1>
+                        </div>
+                        <div class="content">
+                            <p>Hola <strong>%s</strong>,</p>
+                            <p>¡Gracias por tu pedido en HÁBILIS! Tu pago ha sido procesado exitosamente.</p>
+
+                            <div class="order-details">
+                                <h3>Detalles del Pedido</h3>
+                                <p><strong>Número de Pedido:</strong> #%d</p>
+                                <p><strong>Código de Factura:</strong> %s</p>
+                                <p><strong>Fecha:</strong> %s</p>
+                                <p><strong>Total:</strong> €%.2f</p>
+                            </div>
+
+                            <p>Adjunto encontrarás tu factura en formato PDF.</p>
+                            <p>Puedes descargar tu factura en cualquier momento desde tu panel de usuario.</p>
+
+                            <a href="http://localhost/user-dashboard.html" class="button">Ver Mis Pedidos</a>
+
+                            <p style="margin-top: 30px;">Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                        </div>
+                        <div class="footer">
+                            <p>© 2026 HÁBILIS - Kits educativos mensuales</p>
+                            <p>Este es un email automático, por favor no respondas a este mensaje.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+                .formatted(
+                        pedido.getUsuario().getNombreCompleto(),
+                        pedido.getId(),
+                        factura.getCodigoFactura(),
+                        factura.getFechaEmision().toString(),
+                        pedido.getTotalPedido());
     }
 
     /**

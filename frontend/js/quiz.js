@@ -382,30 +382,46 @@ async function completeOrder() {
 
             // Verificar si la respuesta es exitosa (status 2xx)
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || errorData.message || 'Error en el servidor');
+                // Intentar parsear el error si hay contenido JSON
+                let errorMessage = 'Error en el servidor';
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorData.message || errorMessage;
+                    } catch (e) {
+                        console.error('Error parseando JSON de error:', e);
+                        errorMessage = `Error ${response.status}: ${response.statusText}`;
+                    }
+                } else {
+                    errorMessage = `Error ${response.status}: ${response.statusText}`;
+                }
+
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
             console.log('Respuesta del servidor:', data);
 
-            // El backend retorna {success: true, message: "...", pedido: {...}}
-            if (data.success && data.pedido) {
+            // El backend retorna {success: true, message: "...", pedido: {...}, codigoFactura: "..."}
+            if (data.success && data.pedido && data.codigoFactura) {
                 // Pedido creado exitosamente
-                alert(`¡Pedido creado exitosamente! 🎉\n\nNúmero de pedido: #${data.pedido.id}\nTotal: €${quizState.selectedKit.precio.toFixed(2)}\n\nRecibirás un email de confirmación en: ${email}`);
+                console.log('Pedido creado:', data.pedido.id);
+                console.log('Código de factura:', data.codigoFactura);
 
                 // Limpiar sessionStorage si existe
                 sessionStorage.removeItem('pendingQuizCheckout');
 
-                // Redirigir a dashboard
-                window.location.href = 'user-dashboard.html';
+                // Redirigir a página de confirmación con parámetros
+                window.location.href = `order-confirmation.html?orderId=${data.pedido.id}&invoiceCode=${data.codigoFactura}`;
             } else {
                 throw new Error(data.message || 'Error al crear pedido');
             }
 
         } else {
-            // Usuario NO logueado - guardar datos del quiz y redirigir a registro
-            console.log('Usuario no logueado, guardando datos del quiz...');
+            // Usuario NO logueado - verificar si el email existe en BD
+            console.log('Usuario no logueado, verificando si el email existe...');
 
             const quizData = {
                 childName: quizState.childName,

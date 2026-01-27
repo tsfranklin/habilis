@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Pedido - HÁBILIS</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .confirmation-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .confirmation-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .order-summary {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .order-summary h3 {
+            color: #FF6B35;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .order-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .order-detail:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 18px;
+            color: #FF6B35;
+        }
+
+        .invoice-section {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .invoice-code {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .download-btn {
+            background: white;
+            color: #FF6B35;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn i {
+            margin-right: 10px;
+        }
+
+        .email-notice {
+            background: #E3F2FD;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+
+        .email-notice i {
+            color: #2196F3;
+            margin-right: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-primary {
+            background: #FF6B35;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #FF8C61;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>HÁBILIS</span>
+            </div>
+            <nav>
+                <a href="index.html">Inicio</a>
+                <a href="catalog.html">Catálogo</a>
+                <a href="user-dashboard.html">Mi Cuenta</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Confirmation Content -->
+    <div class="confirmation-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+
+        <h1 class="confirmation-title">¡Pedido Confirmado!</h1>
+        <p class="confirmation-subtitle">Tu pago ha sido procesado exitosamente</p>
+
+        <div class="order-summary">
+            <h3>Resumen del Pedido</h3>
+            <div class="order-detail">
+                <span>Número de Pedido:</span>
+                <span id="orderId">#...</span>
+            </div>
+            <div class="order-detail">
+                <span>Producto:</span>
+                <span id="productName">...</span>
+            </div>
+            <div class="order-detail">
+                <span>Plan:</span>
+                <span id="planType">Suscripción Mensual</span>
+            </div>
+            <div class="order-detail">
+                <span>Total Pagado:</span>
+                <span id="totalAmount">€...</span>
+            </div>
+        </div>
+
+        <div class="invoice-section">
+            <h3 style="margin-top: 0;">📄 Tu Factura</h3>
+            <p>Código de Factura:</p>
+            <div class="invoice-code" id="invoiceCode">FAC-XXXXXXXX-XXXXX</div>
+            <button class="download-btn" id="downloadInvoice">
+                <i class="fas fa-download"></i>
+                Descargar Factura PDF
+            </button>
+        </div>
+
+        <div class="email-notice">
+            <i class="fas fa-envelope"></i>
+            <strong>Email enviado:</strong> Hemos enviado una copia de tu factura a <span id="userEmail">tu
+                correo</span>
+        </div>
+
+        <div class="action-buttons">
+            <a href="index.html" class="btn-secondary">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+            <a href="user-dashboard.html" class="btn-primary">
+                <i class="fas fa-user"></i> Ver Mis Pedidos
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        const invoiceCode = urlParams.get('invoiceCode');
+
+        // Si no hay parámetros, redirigir al inicio
+        if (!orderId || !invoiceCode) {
+            window.location.href = 'index.html';
+        }
+
+        // Cargar datos del pedido
+        async function loadOrderData() {
+            try {
+                const response = await fetch(`http://localhost:8080/api/pedidos/${orderId}`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const pedido = await response.json();
+
+                    // Actualizar UI
+                    document.getElementById('orderId').textContent = '#' + pedido.id;
+                    document.getElementById('totalAmount').textContent = '€' + pedido.totalPedido.toFixed(2);
+
+                    // Obtener nombre del producto (primer detalle)
+                    if (pedido.detalles && pedido.detalles.length > 0) {
+                        document.getElementById('productName').textContent = pedido.detalles[0].producto.nombre;
+                    }
+                }
+
+                // Actualizar código de factura
+                document.getElementById('invoiceCode').textContent = invoiceCode;
+
+                // Obtener email del usuario
+                const userResponse = await fetch('http://localhost:8080/api/auth/me', {
+                    credentials: 'include'
+                });
+
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    document.getElementById('userEmail').textContent = userData.correoElectronico;
+                }
+
+            } catch (error) {
+                console.error('Error al cargar datos del pedido:', error);
+            }
+        }
+
+        // Descargar factura
+        document.getElementById('downloadInvoice').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/facturas/${invoiceCode}/descargar`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `factura_${invoiceCode}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Error al descargar la factura. Por favor, inténtalo de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error al descargar factura:', error);
+                alert('Error al descargar la factura. Por favor, inténtalo de nuevo.');
+            }
+        });
+
+        // Cargar datos al iniciar
+        loadOrderData();
+    </script>
+</body>
+
+</html>

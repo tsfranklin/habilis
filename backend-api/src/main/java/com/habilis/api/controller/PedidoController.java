@@ -1,7 +1,10 @@
 package com.habilis.api.controller;
 
 import com.habilis.api.dto.PedidoRequest;
+import com.habilis.api.entity.Factura;
 import com.habilis.api.entity.Pedido;
+import com.habilis.api.service.EmailService;
+import com.habilis.api.service.FacturaService;
 import com.habilis.api.service.PdfService;
 import com.habilis.api.service.PedidoService;
 import jakarta.servlet.http.HttpSession;
@@ -27,10 +30,15 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
     private final PdfService pdfService;
+    private final FacturaService facturaService;
+    private final EmailService emailService;
 
-    public PedidoController(PedidoService pedidoService, PdfService pdfService) {
+    public PedidoController(PedidoService pedidoService, PdfService pdfService,
+            FacturaService facturaService, EmailService emailService) {
         this.pedidoService = pedidoService;
         this.pdfService = pdfService;
+        this.facturaService = facturaService;
+        this.emailService = emailService;
     }
 
     /**
@@ -64,10 +72,33 @@ public class PedidoController {
             // Crear pedido
             Pedido pedido = pedidoService.crearPedido(userId, request.getItems());
 
+            // Generar código de factura único
+            String codigoFactura = facturaService.generarCodigoFactura();
+
+            // Crear factura
+            Factura factura = facturaService.crearFactura(pedido, codigoFactura);
+
+            // Generar PDF de la factura
+            byte[] pdfBytes = pdfService.generarFacturaPedido(pedido.getId());
+
+            // Enviar email con PDF adjunto
+            try {
+                emailService.enviarConfirmacionPedido(
+                        pedido.getUsuario().getCorreoElectronico(),
+                        pedido,
+                        factura,
+                        pdfBytes);
+            } catch (Exception e) {
+                System.err.println("⚠️ Error al enviar email, pero pedido creado: " + e.getMessage());
+                // No fallar la creación del pedido si el email falla
+            }
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Pedido creado exitosamente");
             response.put("pedido", pedido);
+            response.put("codigoFactura", codigoFactura);
+            response.put("facturaId", factura.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {

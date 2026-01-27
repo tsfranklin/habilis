@@ -352,4 +352,14 @@ public class UsuarioService {
                 usuario.getNombreCompleto(),
                 nuevoToken);
     }
+
+    /**
+     * Verificar si un email existe en la base de datos
+     * 
+     * @param correoElectronico Email a verificar
+     * @return true si el email existe, false si no
+     */
+    public boolean existeEmail(String correoElectronico) {
+        return usuarioRepository.existsByCorreoElectronico(correoElectronico);
+    }
 }
