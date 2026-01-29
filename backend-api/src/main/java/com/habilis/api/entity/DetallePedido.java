@@ -23,11 +23,14 @@ public class DetallePedido {
     @NotNull(message = "El pedido es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "detalles", "usuario", "hibernateLazyInitializer",
+            "handler" })
     private Pedido pedido;
 
     @NotNull(message = "El producto es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "categoria", "hibernateLazyInitializer", "handler" })
     private Producto producto;
 
     @NotNull(message = "La cantidad es obligatoria")
@@ -37,7 +40,8 @@ public class DetallePedido {
 
     /**
      * Precio unitario en el momento de la compra (histórico e inmutable)
-     * CRUCIAL: Si mañana cambia el precio en la tabla productos, este dato NO cambia
+     * CRUCIAL: Si mañana cambia el precio en la tabla productos, este dato NO
+     * cambia
      */
     @NotNull(message = "El precio unitario es obligatorio")
     @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
@@ -98,6 +102,7 @@ public class DetallePedido {
 
     /**
      * Calcula el subtotal de esta línea de pedido
+     * 
      * @return cantidad * precioUnitario
      */
     public BigDecimal getSubtotal() {

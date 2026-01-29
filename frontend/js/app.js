@@ -3,7 +3,7 @@
 // Lógica para index.html
 // ========================================
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = '/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     verificarSesion();
@@ -30,7 +30,7 @@ async function verificarSesion() {
 
             authContainer.innerHTML = `
                 <a href="${user.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html'}" class="btn-text">
-                    👋 Hola, ${primerNombre}
+                    Hola, ${primerNombre}
                 </a>
                 <button onclick="logout()" class="btn btn-secondary btn-sm">Salir</button>
             `;

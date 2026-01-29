@@ -24,6 +24,8 @@ public class Pedido {
     @NotNull(message = "El usuario es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "pedidos", "password", "hibernateLazyInitializer",
+            "handler" })
     private Usuario usuario;
 
     @NotNull(message = "La fecha del pedido es obligatoria")

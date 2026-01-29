@@ -51,8 +51,16 @@ public class PedidoController {
             @Valid @RequestBody PedidoRequest request,
             HttpSession session) {
 
+        // 🔍 LOG: Verificar sesión
+        System.out.println("=== CREAR PEDIDO - DEBUG ===");
+        System.out.println("Session ID: " + session.getId());
+        System.out.println("User ID from session: " + session.getAttribute("userId"));
+        System.out.println("User Role from session: " + session.getAttribute("userRole"));
+        System.out.println("Request items: " + request.getItems().size());
+
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
+            System.err.println("❌ ERROR: No hay sesión activa (userId es null)");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     Map.of("error", "Debes iniciar sesión primero"));
         }
@@ -61,25 +69,34 @@ public class PedidoController {
         request.setUsuarioId(userId);
 
         try {
+            System.out.println("✅ Usuario autenticado: " + userId);
+
             // Validar carrito
             List<String> errores = pedidoService.validarCarrito(request.getItems());
             if (!errores.isEmpty()) {
+                System.err.println("❌ Errores en validación del carrito: " + errores);
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "Errores en el carrito",
                         "detalles", errores));
             }
 
+            System.out.println("✅ Carrito validado correctamente");
+
             // Crear pedido
             Pedido pedido = pedidoService.crearPedido(userId, request.getItems());
+            System.out.println("✅ Pedido creado con ID: " + pedido.getId());
 
             // Generar código de factura único
             String codigoFactura = facturaService.generarCodigoFactura();
+            System.out.println("✅ Código de factura generado: " + codigoFactura);
 
             // Crear factura
             Factura factura = facturaService.crearFactura(pedido, codigoFactura);
+            System.out.println("✅ Factura creada con ID: " + factura.getId());
 
             // Generar PDF de la factura
             byte[] pdfBytes = pdfService.generarFacturaPedido(pedido.getId());
+            System.out.println("✅ PDF generado: " + pdfBytes.length + " bytes");
 
             // Enviar email con PDF adjunto
             try {
@@ -88,20 +105,28 @@ public class PedidoController {
                         pedido,
                         factura,
                         pdfBytes);
+                System.out.println("✅ Email de confirmación enviado a: " + pedido.getUsuario().getCorreoElectronico());
             } catch (Exception e) {
                 System.err.println("⚠️ Error al enviar email, pero pedido creado: " + e.getMessage());
                 // No fallar la creación del pedido si el email falla
             }
 
+            // Respuesta simplificada sin referencias circulares
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Pedido creado exitosamente");
-            response.put("pedido", pedido);
+            response.put("pedidoId", pedido.getId());
             response.put("codigoFactura", codigoFactura);
             response.put("facturaId", factura.getId());
+            response.put("totalPedido", pedido.getTotalPedido());
+
+            System.out.println("✅ Respuesta enviada al cliente");
+            System.out.println("=== FIN CREAR PEDIDO ===");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
+            System.err.println("❌ ERROR al crear pedido: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(
                     Map.of("error", e.getMessage()));
         }
@@ -198,7 +223,36 @@ public class PedidoController {
                         Map.of("error", "No tienes permiso para ver este pedido"));
             }
 
-            return ResponseEntity.ok(pedido);
+            // Crear respuesta simplificada sin referencias circulares
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", pedido.getId());
+            response.put("totalPedido", pedido.getTotalPedido());
+            response.put("estado", pedido.getEstado());
+            response.put("fechaPedido", pedido.getFechaPedido());
+
+            // Detalles simplificados
+            if (pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
+                List<Map<String, Object>> detallesSimplificados = pedido.getDetalles().stream()
+                        .map(detalle -> {
+                            Map<String, Object> detalleMap = new HashMap<>();
+                            detalleMap.put("cantidad", detalle.getCantidad());
+                            detalleMap.put("precioUnitario", detalle.getPrecioUnitario());
+                            detalleMap.put("subtotal", detalle.getSubtotal());
+
+                            // Producto simplificado
+                            Map<String, Object> productoMap = new HashMap<>();
+                            productoMap.put("id", detalle.getProducto().getId());
+                            productoMap.put("nombre", detalle.getProducto().getNombre());
+                            detalleMap.put("producto", productoMap);
+
+                            return detalleMap;
+                        })
+                        .collect(java.util.stream.Collectors.toList());
+
+                response.put("detalles", detallesSimplificados);
+            }
+
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of("error", e.getMessage()));

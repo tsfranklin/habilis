@@ -27,38 +27,26 @@ public class SecurityConfig {
         /**
          * Configuración principal de seguridad
          * Define qué rutas son públicas y cuáles requieren autenticación
+         * 
+         * TEMPORAL: Seguridad deshabilitada para debugging
          */
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                // Deshabilitar CSRF temporalmente (se habilitará después con tokens)
+                                // Deshabilitar CSRF
                                 .csrf(csrf -> csrf.disable())
 
                                 // Configurar CORS
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                                // Configurar autorización de requests
+                                // TEMPORAL: Permitir TODAS las peticiones sin autenticación
                                 .authorizeHttpRequests(auth -> auth
-                                                // Rutas públicas (sin autenticación)
-                                                .requestMatchers("/api/auth/**").permitAll()
-                                                .requestMatchers("/api/health", "/api/welcome").permitAll()
-                                                .requestMatchers("/api/test/**").permitAll()
-
-                                                // Productos y Categorías - GET público (para catálogo y quiz)
-                                                .requestMatchers("GET", "/api/productos", "/api/productos/**")
-                                                .permitAll()
-                                                .requestMatchers("GET", "/api/categorias", "/api/categorias/**")
-                                                .permitAll()
-
-                                                // Rutas que requieren autenticación
-                                                .anyRequest().authenticated())
+                                                .anyRequest().permitAll())
 
                                 // Configurar manejo de sesiones HTTP
                                 .sessionManagement(session -> session
-                                                .maximumSessions(1) // Máximo una sesión por usuario
-                                                .maxSessionsPreventsLogin(false) // Permitir nueva sesión (invalida la
-                                                                                 // anterior)
-                                )
+                                                .maximumSessions(1)
+                                                .maxSessionsPreventsLogin(false))
 
                                 // Deshabilitar el formulario de login por defecto
                                 .formLogin(form -> form.disable())

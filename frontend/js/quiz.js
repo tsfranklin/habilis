@@ -2,7 +2,60 @@
 // QUIZ FUNNEL - JAVASCRIPT
 // ========================================
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// ========================================
+// CONFIGURACIÓN
+// ========================================
+
+const API_BASE_URL = '/api';
+
+// ========================================
+// AUTENTICACIÓN Y NAVBAR
+// ========================================
+
+async function checkAuth() {
+    const authButtons = document.getElementById('authButtons');
+    if (!authButtons) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            // Usuario autenticado - mostrar botón Salir
+            authButtons.innerHTML = `
+                <a href="#" onclick="logout(); return false;" class="btn btn-outline">Salir</a>
+            `;
+        } else {
+            // Usuario NO autenticado - mostrar botón Entrar
+            authButtons.innerHTML = `
+                <a href="login.html" class="btn btn-outline">Entrar</a>
+            `;
+        }
+    } catch (error) {
+        // Error de red - mostrar botón Entrar
+        authButtons.innerHTML = `
+            <a href="login.html" class="btn btn-outline">Entrar</a>
+        `;
+    }
+}
+
+async function logout() {
+    try {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        window.location.href = 'index.html';
+    }
+}
+
+// ========================================
+// DATOS Y ESTADO DEL QUIZ
+// ========================================
 
 // State
 const quizState = {
@@ -125,6 +178,7 @@ function goToStep(stepNumber) {
         showResult();
     } else if (stepNumber === 4) {
         showCheckoutSummary();
+        checkAndFillEmail(); // Pre-llenar email si el usuario está logueado
     }
 
     // Scroll to top
@@ -336,6 +390,56 @@ function showCheckoutSummary() {
     document.getElementById('checkoutTotal').textContent = `€${quizState.selectedKit.precio.toFixed(2)}`;
 }
 
+// ========================================
+// PRE-LLENADO DE EMAIL PARA USUARIOS LOGUEADOS
+// ========================================
+
+async function checkAndFillEmail() {
+    const emailInput = document.getElementById('parentEmail');
+    if (!emailInput) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            // Usuario está logueado
+            const userData = await response.json();
+
+            // Pre-llenar el campo con su email
+            emailInput.value = userData.correoElectronico;
+
+            // Deshabilitar el campo (no puede editarlo)
+            emailInput.disabled = true;
+
+            // Cambiar el estilo para indicar que está deshabilitado
+            emailInput.style.backgroundColor = '#f5f5f5';
+            emailInput.style.cursor = 'not-allowed';
+
+            // Cambiar el placeholder para indicar que está pre-llenado
+            emailInput.placeholder = 'Email de tu cuenta';
+
+            console.log('✅ Email pre-llenado para usuario logueado:', userData.correoElectronico);
+        } else {
+            // Usuario NO está logueado
+            emailInput.value = '';
+            emailInput.disabled = false;
+            emailInput.style.backgroundColor = '';
+            emailInput.style.cursor = '';
+            emailInput.placeholder = 'papa@email.com';
+
+            console.log('ℹ️ Usuario no logueado, campo de email editable');
+        }
+    } catch (error) {
+        console.error('Error verificando autenticación:', error);
+        // En caso de error, dejar el campo editable
+        emailInput.disabled = false;
+        emailInput.style.backgroundColor = '';
+        emailInput.style.cursor = '';
+    }
+}
+
 async function completeOrder() {
     const btnCheckout = document.getElementById('btnCheckout');
     btnCheckout.disabled = true;
@@ -419,11 +523,11 @@ async function completeOrder() {
 
                 if (checkData.exists) {
                     // El email YA EXISTE → Redirigir a LOGIN
-                    alert('¡Ya tienes una cuenta con este email! 🎉\n\nTe redirigiremos al login para completar tu pedido.');
+                    alert('Ya tienes una cuenta con este email.\n\nInicia sesión para continuar.');
                     window.location.href = `login.html?from=quiz&email=${encodeURIComponent(email)}`;
                 } else {
                     // El email NO existe → Redirigir a REGISTRO
-                    alert('¡Genial! Para completar tu pedido necesitas crear una cuenta.\n\nTe redirigiremos al registro. Tus datos del quiz están guardados. 😊');
+                    alert('Para completar tu pedido necesitas crear una cuenta.\n\nTus datos del quiz están guardados.');
                     window.location.href = `register.html?from=quiz&email=${encodeURIComponent(email)}&product=${quizState.selectedKit.id}`;
                 }
                 return;
@@ -447,10 +551,15 @@ async function completeOrder() {
 }
 
 // ========================================
-// INITIALIZATION
+// INICIALIZACIÓN
 // ========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
+    // Verificar autenticación y mostrar botones apropiados
+    checkAuth();
+
+    // Cargar paso inicial
+    loadStep(currentStep);
     console.log('Quiz Funnel Loaded');
 
     // Check if user is returning from registration to complete checkout
@@ -486,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show message to user
             setTimeout(() => {
-                alert('👋 ¡Bienvenido!\n\nAhora puedes completar tu pedido.');
+                alert('Bienvenido.\n\nAhora puedes completar tu pedido.');
             }, 500);
         } else {
             console.warn('No se encontraron datos del quiz en sessionStorage');

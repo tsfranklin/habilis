@@ -279,6 +279,19 @@ a:hover {
     font-size: 0.875rem;
 }
 
+.btn-outline {
+    background-color: transparent;
+    color: var(--text-dark);
+    border: 2px solid var(--text-dark);
+    padding: 0.75rem 1.75rem;
+}
+
+.btn-outline:hover {
+    background-color: var(--text-dark);
+    color: var(--bg-white);
+    transform: translateY(-1px);
+}
+
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -1289,4 +1302,62 @@ footer {
         flex-direction: column;
         gap: 2rem;
     }
+}
+
+/* ========================================
+   ESTADOS VACÍOS Y DE ERROR
+   ======================================== */
+
+.empty-state,
+.error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.empty-state h3,
+.error-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+}
+
+.empty-state p,
+.error-state p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.empty-state svg,
+.error-state svg {
+    display: block;
+    margin: 0 auto 1.5rem;
+}
+
+.order-header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.text-muted {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* Mejoras para iconos SVG en stat-cards */
+.stat-icon svg {
+    display: block;
+}
+
+/* Loading state */
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-light);
+    font-size: 1.125rem;
 }

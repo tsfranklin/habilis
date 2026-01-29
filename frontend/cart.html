@@ -20,7 +20,7 @@
                 <a href="user-dashboard.html" class="nav-link">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
-                <a href="quiz.html" class="nav-link">
+                <a href="catalog.html" class="nav-link">
                     <i class="fas fa-boxes"></i> Catálogo
                 </a>
                 <a href="cart.html" class="nav-link active">
@@ -78,7 +78,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8080/api';
+        const API_BASE_URL = '/api';
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
         let products = {};
 
@@ -91,7 +91,7 @@
                         <i class="fas fa-shopping-cart" style="font-size: 4rem; color: var(--text-light); margin-bottom: 1.5rem;"></i>
                         <h3 style="color: var(--text-dark); margin-bottom: 1rem;">Tu carrito está vacío</h3>
                         <p style="color: var(--text-light); margin-bottom: 2rem;">¡Descubre nuestros kits educativos!</p>
-                        <a href="quiz.html" class="btn btn-primary">
+                        <a href="catalog.html" class="btn btn-primary">
                             <i class="fas fa-boxes"></i> Explorar Catálogo
                         </a>
                     </div>
@@ -190,44 +190,24 @@
                 return;
             }
 
-            const checkoutBtn = document.getElementById('checkoutBtn');
-            checkoutBtn.disabled = true;
-            checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-
+            // Verificar que el usuario esté autenticado
             try {
-                // Get current user ID
-                const userResponse = await fetch(`${API_BASE_URL}/auth/me`, { credentials: 'include' });
-                const userData = await userResponse.json();
-
-                const orderData = {
-                    usuarioId: userData.id,
-                    items: cart
-                };
-
-                const response = await fetch(`${API_BASE_URL}/pedidos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(orderData)
+                const userResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+                    credentials: 'include'
                 });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('¡Pedido realizado exitosamente! 🎉');
-                    localStorage.removeItem('cart');
-                    window.location.href = 'user-dashboard.html';
-                } else {
-                    alert(data.error || 'Error al procesar el pedido');
-                    checkoutBtn.disabled = false;
-                    checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Realizar Pedido';
+                if (!userResponse.ok) {
+                    alert('Debes iniciar sesión para continuar');
+                    window.location.href = 'login.html';
+                    return;
                 }
             } catch (error) {
-                console.error('Checkout error:', error);
-                alert('Error al procesar el pedido. Inténtalo de nuevo.');
-                checkoutBtn.disabled = false;
-                checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Realizar Pedido';
+                alert('Debes iniciar sesión para continuar');
+                window.location.href = 'login.html';
+                return;
             }
+
+            // Redirigir a la página de pago
+            window.location.href = 'payment.html';
         }
 
         async function logout() {

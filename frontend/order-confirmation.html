@@ -251,7 +251,7 @@
         // Cargar datos del pedido
         async function loadOrderData() {
             try {
-                const response = await fetch(`http://localhost:8080/api/pedidos/${orderId}`, {
+                const response = await fetch(`/api/pedidos/${orderId}`, {
                     credentials: 'include'
                 });
 
@@ -272,7 +272,7 @@
                 document.getElementById('invoiceCode').textContent = invoiceCode;
 
                 // Obtener email del usuario
-                const userResponse = await fetch('http://localhost:8080/api/auth/me', {
+                const userResponse = await fetch('/api/auth/me', {
                     credentials: 'include'
                 });
 
@@ -290,7 +290,7 @@
         document.getElementById('downloadInvoice').addEventListener('click', async () => {
             try {
                 // Use the correct endpoint for downloading invoice
-                const response = await fetch(`http://localhost:8080/api/pedidos/${orderId}/factura`, {
+                const response = await fetch(`/api/pedidos/${orderId}/factura`, {
                     credentials: 'include'
                 });
 

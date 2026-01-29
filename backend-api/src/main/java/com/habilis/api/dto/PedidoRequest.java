@@ -2,7 +2,6 @@ package com.habilis.api.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -11,7 +10,8 @@ import java.util.List;
  */
 public class PedidoRequest {
 
-    @NotNull(message = "El ID del usuario es obligatorio")
+    // El usuarioId se obtiene de la sesión HTTP en el controlador,
+    // no es necesario enviarlo en el request
     private Long usuarioId;
 
     @NotEmpty(message = "El pedido debe tener al menos un producto")

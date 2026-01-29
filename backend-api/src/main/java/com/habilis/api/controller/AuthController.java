@@ -87,11 +87,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
         try {
+            System.out.println("=== LOGIN - DEBUG ===");
+            System.out.println("Email: " + request.getCorreoElectronico());
+            System.out.println("Session ID antes de login: " + session.getId());
+
             Usuario usuario = usuarioService.login(request.getCorreoElectronico(), request.getContrasena());
 
             // Verificar si tiene 2FA habilitado
             if (usuario.getTwoFactorEnabled()) {
                 // NO crear sesión aún - esperar código 2FA
+                System.out.println("⚠️ Usuario tiene 2FA habilitado, esperando código");
                 AuthResponse response = new AuthResponse(true, "Se requiere autenticación de dos factores");
                 response.setUserId(usuario.getId());
                 response.setRequires2FA(true);
@@ -101,6 +106,13 @@ public class AuthController {
                 session.setAttribute("userId", usuario.getId());
                 session.setAttribute("userRole", usuario.getTipoUsuario());
 
+                System.out.println("✅ Sesión creada:");
+                System.out.println("  - Session ID: " + session.getId());
+                System.out.println("  - User ID: " + session.getAttribute("userId"));
+                System.out.println("  - User Role: " + session.getAttribute("userRole"));
+                System.out.println("  - Max Inactive Interval: " + session.getMaxInactiveInterval() + " segundos");
+                System.out.println("=== FIN LOGIN ===");
+
                 return ResponseEntity.ok(new AuthResponse(
                         true,
                         "Login exitoso",
@@ -108,6 +120,7 @@ public class AuthController {
                         usuario.getTipoUsuario()));
             }
         } catch (RuntimeException e) {
+            System.err.println("❌ Error en login: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(false, e.getMessage()));
         }
     }

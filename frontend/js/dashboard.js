@@ -2,7 +2,7 @@
 // CONFIGURACIÓN Y UTILIDADES
 // ========================================
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = '/api';
 
 // Check auth on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -131,7 +131,18 @@ async function loadOrders() {
         const orders = await response.json();
 
         if (orders.length === 0) {
-            container.innerHTML = '<p class="empty-message">No tienes pedidos aún. <a href="catalog.html">¡Explora nuestro catálogo!</a></p>';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-light); margin-bottom: 1rem;">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    <h3>No tienes pedidos aún</h3>
+                    <p>¡Explora nuestro catálogo y realiza tu primer pedido!</p>
+                    <a href="quiz.html" class="btn btn-primary">Ver Catálogo</a>
+                </div>
+            `;
             return;
         }
 
@@ -140,24 +151,29 @@ async function loadOrders() {
                 <div class="order-header">
                     <div>
                         <h3>Pedido #${order.id}</h3>
-                        <p class="order-date">${new Date(order.fechaPedido).toLocaleDateString('es-ES')}</p>
+                        <p class="order-date">${new Date(order.fechaPedido).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     </div>
-                    <div>
+                    <div class="order-header-right">
                         <span class="order-status badge badge-${getStatusClass(order.estado)}">${order.estado}</span>
                         <span class="order-total">€${order.totalPedido.toFixed(2)}</span>
                     </div>
                 </div>
                 <div class="order-items">
-                    ${order.detalles.map(detail => `
+                    ${order.detalles && order.detalles.length > 0 ? order.detalles.map(detail => `
                         <div class="order-item">
                             <span>${detail.producto.nombre}</span>
                             <span>${detail.cantidad}x €${detail.precioUnitario.toFixed(2)}</span>
                         </div>
-                    `).join('')}
+                    `).join('') : '<p class="text-muted">Sin detalles disponibles</p>'}
                 </div>
                 <div class="order-actions">
                     <button onclick="downloadInvoice(${order.id})" class="btn btn-primary btn-sm">
-                        📄 Descargar Factura
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.5rem;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Descargar Factura
                     </button>
                     ${order.estado === 'PENDIENTE' ? `
                         <button onclick="cancelOrder(${order.id})" class="btn btn-danger btn-sm">Cancelar Pedido</button>
@@ -167,7 +183,18 @@ async function loadOrders() {
         `).join('');
     } catch (error) {
         console.error('Error loading orders:', error);
-        container.innerHTML = '<p class="error-message">Error al cargar pedidos</p>';
+        container.innerHTML = `
+            <div class="error-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--danger); margin-bottom: 1rem;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3>Error al cargar pedidos</h3>
+                <p>Por favor, intenta de nuevo más tarde</p>
+                <button onclick="loadOrders()" class="btn btn-primary">Reintentar</button>
+            </div>
+        `;
     }
 }
 
@@ -204,6 +231,36 @@ async function cancelOrder(orderId) {
         alert('Error al cancelar pedido');
     }
 }
+
+// ========================================
+// DOWNLOAD INVOICE
+// ========================================
+
+async function downloadInvoice(orderId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/pedidos/${orderId}/factura`, {
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al descargar la factura');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `factura-pedido-${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error downloading invoice:', error);
+        alert('Error al descargar la factura. Por favor, intenta de nuevo.');
+    }
+}
+
 
 // ========================================
 // 2FA MANAGEMENT

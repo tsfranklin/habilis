@@ -17,7 +17,7 @@
                 <i class="fas fa-shapes"></i> HÁBILIS
             </a>
             <div class="nav-links">
-                <a href="quiz.html" class="nav-link">
+                <a href="catalog.html" class="nav-link">
                     <i class="fas fa-boxes"></i> Catálogo
                 </a>
                 <a href="user-dashboard.html" class="nav-link active">
@@ -27,7 +27,7 @@
                     <i class="fas fa-shopping-cart"></i> Carrito
                 </a>
                 <div class="user-menu">
-                    <span id="userName" style="font-weight: 600;">👤 Usuario</span>
+                    <span id="userName" style="font-weight: 600;">Usuario</span>
                     <button onclick="logout()" class="btn btn-logout">Salir</button>
                 </div>
             </div>
@@ -63,28 +63,59 @@
                 <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon" style="color: var(--secondary);">📦</div>
+                        <div class="stat-icon" style="color: var(--secondary);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                </path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
                         <div>
                             <div class="stat-value" id="totalOrders">-</div>
                             <div class="stat-label">Pedidos Totales</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="color: #ffc107;">⏳</div>
+                        <div class="stat-icon" style="color: #ffc107;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
                         <div>
                             <div class="stat-value" id="pendingOrders">-</div>
                             <div class="stat-label">Pendientes</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="color: var(--accent);">✅</div>
+                        <div class="stat-icon" style="color: var(--accent);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
                         <div>
                             <div class="stat-value" id="completedOrders">-</div>
                             <div class="stat-label">Completados</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="color: var(--secondary);">💰</div>
+                        <div class="stat-icon" style="color: var(--secondary);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
                         <div>
                             <div class="stat-value" id="totalSpent">-</div>
                             <div class="stat-label">Total Gastado</div>
@@ -92,28 +123,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div style="margin-top: 3rem;">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary);">Acciones Rápidas</h3>
-                    <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-                        <a href="quiz.html" class="card"
-                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛍️</div>
-                            <div style="font-weight: 600; color: var(--primary);">Ver Catálogo</div>
-                        </a>
-                        <a href="cart.html" class="card"
-                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛒</div>
-                            <div style="font-weight: 600; color: var(--primary);">Mi Carrito</div>
-                        </a>
-                        <a href="#" onclick="showSection('orders')" class="card"
-                            style="text-align: center; padding: 2rem; text-decoration: none; transition: var(--transition);">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
-                            <div style="font-weight: 600; color: var(--primary);">Ver Pedidos</div>
-                        </a>
-                    </div>
-                </div>
             </section>
 
             <!-- Orders Section -->
