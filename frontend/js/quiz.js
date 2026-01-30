@@ -471,7 +471,7 @@ async function completeOrder() {
             console.log('Datos guardados para pago (usuario logueado):', paymentData);
 
             // Limpiar pendingQuizCheckout si existe
-            sessionStorage.removeItem('pendingQuizCheckout');
+            localStorage.removeItem('pendingQuizCheckout');
 
             // Redirigir a la página de pago
             window.location.href = 'payment.html';
@@ -503,9 +503,9 @@ async function completeOrder() {
                 timestamp: new Date().toISOString()
             };
 
-            // Guardar en sessionStorage para recuperar después del registro/login
-            sessionStorage.setItem('pendingQuizCheckout', JSON.stringify(quizData));
-            console.log('Datos guardados en sessionStorage:', quizData);
+            // Guardar en localStorage para recuperar después del registro/login
+            localStorage.setItem('pendingQuizCheckout', JSON.stringify(quizData));
+            console.log('Datos guardados en localStorage:', quizData);
 
             // Verificar si el email ya existe en la BD
             try {
@@ -567,7 +567,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const resumeCheckout = urlParams.get('resumeCheckout');
 
     if (resumeCheckout === 'true') {
-        const savedQuiz = sessionStorage.getItem('pendingQuizCheckout');
+        const savedQuiz = localStorage.getItem('pendingQuizCheckout');
         if (savedQuiz) {
             console.log('Restaurando datos del quiz...');
             const quizData = JSON.parse(savedQuiz);

@@ -79,23 +79,16 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
                 showMessage('loginSuccess', 'Inicio de sesión exitoso', 'success');
 
                 // Check if user came from quiz checkout
-                const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
-                const urlParams = new URLSearchParams(window.location.search);
-                const fromQuiz = urlParams.get('from') === 'quiz';
+                const pendingQuiz = localStorage.getItem('pendingQuizCheckout');
 
-                if (pendingQuiz && fromQuiz) {
-                    // User came from quiz - keep the quiz data and redirect back
-                    console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
+                if (pendingQuiz) {
+                    // User has pending quiz data - redirect back to complete checkout
+                    console.log('Datos del quiz detectados, redirigiendo a completar pedido...');
                     setTimeout(() => {
-                        // Redirect back to quiz to complete checkout
                         window.location.href = 'quiz.html?resumeCheckout=true';
                     }, 1000);
                 } else {
-                    // Normal login - clear any old quiz data from previous sessions
-                    sessionStorage.removeItem('pendingQuizCheckout');
-                    console.log('Login normal - quiz data anterior eliminada');
-
-                    // Normal redirect to dashboard
+                    // Normal login - redirect to dashboard
                     setTimeout(() => {
                         window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
                     }, 1000);
@@ -138,24 +131,18 @@ document.getElementById('twoFactorForm')?.addEventListener('submit', async (e) =
         const data = await response.json();
 
         if (data.success) {
-            showMessage('loginSuccess', 'Verificación exitosa', 'success');
+            showMessage('twoFactorSuccess', '¡Código correcto! Redirigiendo...', 'success');
 
-            // Check if user came from quiz checkout
-            const pendingQuiz = sessionStorage.getItem('pendingQuizCheckout');
-            const urlParams = new URLSearchParams(window.location.search);
-            const fromQuiz = urlParams.get('from') === 'quiz';
+            // Check if user has pending quiz data
+            const pendingQuiz = localStorage.getItem('pendingQuizCheckout');
 
-            if (pendingQuiz && fromQuiz) {
-                // User came from quiz - keep the quiz data and redirect back
-                console.log('Usuario viene del quiz, redirigiendo a completar pedido...');
+            if (pendingQuiz) {
+                // User has pending quiz data - redirect back to complete checkout
+                console.log('Datos del quiz detectados (post-2FA), redirigiendo a completar pedido...');
                 setTimeout(() => {
                     window.location.href = 'quiz.html?resumeCheckout=true';
                 }, 1000);
             } else {
-                // Normal login - clear any old quiz data from previous sessions
-                sessionStorage.removeItem('pendingQuizCheckout');
-                console.log('2FA verificado - quiz data anterior eliminada');
-
                 // Normal redirect to dashboard
                 setTimeout(() => {
                     window.location.href = data.tipoUsuario === 'ADMIN' ? 'admin-dashboard.html' : 'user-dashboard.html';
@@ -245,6 +232,107 @@ document.getElementById('registerForm')?.addEventListener('submit', async (e) =>
     } catch (error) {
         console.error('Register error:', error);
         showMessage('registerError', 'Error de conexión con el servidor');
+    } finally {
+        hideLoader(submitBtn);
+    }
+});
+
+// ========================================
+// RECUPERACIÓN DE CONTRASEÑA
+// ========================================
+
+document.getElementById('forgotPasswordForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const email = document.getElementById('forgotEmail').value;
+
+    showLoader(submitBtn);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/recuperar-password?correoElectronico=${encodeURIComponent(email)}`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('forgotError').style.display = 'none';
+            document.getElementById('forgotSuccess').textContent = data.message ||
+                'Si el correo existe, recibirás instrucciones para restablecer tu contraseña';
+            document.getElementById('forgotSuccess').style.display = 'block';
+
+            // Clear form
+            form.reset();
+
+            console.log('✅ Email de recuperación solicitado');
+        } else {
+            showMessage('forgotError', data.message || 'Error al solicitar recuperación');
+        }
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        showMessage('forgotError', 'Error de conexión con el servidor');
+    } finally {
+        hideLoader(submitBtn);
+    }
+});
+
+// ========================================
+// RESTABLECER CONTRASEÑA (con token)
+// ========================================
+
+document.getElementById('resetPasswordForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Obtener token de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+        showMessage('resetError', 'Token de recuperación inválido o expirado');
+        return;
+    }
+
+    // Validar que las contraseñas coincidan
+    if (newPassword !== confirmPassword) {
+        showMessage('resetError', 'Las contraseñas no coinciden');
+        return;
+    }
+
+    showLoader(submitBtn);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/restablecer-password?token=${encodeURIComponent(token)}&nuevaContrasena=${encodeURIComponent(newPassword)}`, {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('resetError').style.display = 'none';
+            document.getElementById('resetSuccess').textContent = '¡Contraseña restablecida exitosamente! Redirigiendo al login...';
+            document.getElementById('resetSuccess').style.display = 'block';
+
+            console.log('✅ Contraseña restablecida');
+
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            showMessage('resetError', data.message || 'Error al restablecer contraseña');
+        }
+    } catch (error) {
+        console.error('Reset password error:', error);
+        showMessage('resetError', 'Error de conexión con el servidor');
     } finally {
         hideLoader(submitBtn);
     }

@@ -30,7 +30,7 @@ async function loadPaymentData() {
 
     // SEGUNDO: Obtener datos de pago de sessionStorage o del carrito
     const paymentDataStr = sessionStorage.getItem('paymentData');
-    const pendingQuizStr = sessionStorage.getItem('pendingQuizCheckout');
+    const pendingQuizStr = localStorage.getItem('pendingQuizCheckout');
     const cartStr = localStorage.getItem('cart');
 
     let paymentData = null;
@@ -64,24 +64,50 @@ async function loadPaymentData() {
             return;
         }
 
-        // Calcular total del carrito
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        // IMPORTANTE: El carrito guarda solo {productoId, cantidad}
+        // Necesitamos fetch de productos para obtener detalles completos
+        try {
+            // Obtener detalles de todos los productos
+            const productPromises = cart.map(item =>
+                fetch(`${API_BASE_URL}/productos/${item.productoId}`, {
+                    credentials: 'include'
+                }).then(r => r.json())
+            );
 
-        // Crear datos de pago desde el carrito
-        paymentData = {
-            productId: cart[0].id, // Primer producto (o podríamos crear un pedido múltiple)
-            productName: cart.length === 1
-                ? cart[0].name
-                : `${cart.length} productos`,
-            productPrice: total,
-            childName: 'Cliente', // No tenemos datos del niño desde el carrito
-            childAge: '', // No tenemos edad desde el carrito
-            profile: '', // No tenemos perfil desde el carrito
-            fromCart: true, // Flag para identificar que viene del carrito
-            cartItems: cart // Guardar todos los items del carrito
-        };
-        console.log('✅ Datos cargados desde carrito:', paymentData);
+            const products = await Promise.all(productPromises);
+
+            // Calcular total y crear lista de items
+            const cartItems = cart.map((item, index) => ({
+                productoId: item.productoId,
+                cantidad: item.cantidad,
+                nombreProducto: products[index].nombre,
+                precio: products[index].precio
+            }));
+
+            const total = cartItems.reduce((sum, item) =>
+                sum + (item.precio * item.cantidad), 0);
+
+            // Crear datos de pago desde el carrito
+            paymentData = {
+                fromCart: true, // Flag para identificar que viene del carrito
+                cartItems: cartItems, // Items completos con detalles
+                productName: cartItems.length === 1
+                    ? cartItems[0].nombreProducto
+                    : `${cartItems.length} productos`,
+                productPrice: total,
+                childName: '', // No hay datos del niño desde carrito
+                childAge: '',
+                profile: ''
+            };
+            console.log('✅ Datos cargados desde carrito:', paymentData);
+        } catch (error) {
+            console.error('❌ Error cargando productos del carrito:', error);
+            alert('⚠️ Error al cargar los productos. Intenta de nuevo.');
+            window.location.href = 'cart.html';
+            return;
+        }
     }
+
 
     if (!paymentData) {
         alert('⚠️ No hay datos de pago. Por favor, agrega productos al carrito o completa el quiz.');
@@ -196,8 +222,8 @@ async function handlePaymentSubmit(e) {
             // Pedido desde carrito - múltiples items
             orderData = {
                 items: paymentData.cartItems.map(item => ({
-                    productoId: item.id,
-                    cantidad: item.quantity
+                    productoId: item.productoId,
+                    cantidad: item.cantidad
                 }))
             };
             console.log('🛒 Creando pedido desde carrito con', paymentData.cartItems.length, 'items');
@@ -253,7 +279,7 @@ async function handlePaymentSubmit(e) {
         if (data.success && data.pedidoId && data.codigoFactura) {
             // Success! Clear session storage
             sessionStorage.removeItem('paymentData');
-            sessionStorage.removeItem('pendingQuizCheckout');
+            localStorage.removeItem('pendingQuizCheckout');
 
             // Si vino del carrito, limpiar el carrito
             if (paymentData.fromCart) {
